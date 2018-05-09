@@ -23,18 +23,25 @@ class Player:
                     self.board[row,col] = BLANK
     
     def action(self, turns):
+        # first turn for player
         if(turns == 0):
             return self.placeFirst()
+        # during placing phase
         elif(0<turns<24):
-            moves = self.availablePosition(self.board,self.minY)
-            
+            move = self.availablePosition(self.board,self.minY)
+            self.timer+= 1
+        # during moving phase
         else:
             move = self.Minimax(self.board)
+            self.timer+= 1
+            
+        return move
     
     # method in cases where player moves first, called once
     def placeFirst(self):
         return 1
     
+    # get available positions to place a piece for placing phase
     def availablePosition(board,minY):
         availableMoves = []
         for row in range(minY,minY+5+1):
@@ -43,6 +50,7 @@ class Player:
                     availableMoves.append((row,col))
         return availableMoves
     
+    # get available moves each piece has in moving phase
     def availableMoves(board,currPos):
         moves = []
         for piece in currPos:
