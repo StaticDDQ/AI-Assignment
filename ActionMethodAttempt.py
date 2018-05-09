@@ -25,7 +25,7 @@ class Player:
             self.timer+= 1
         # during moving phase
         else:
-            move = self.Minimax(self.board)
+            move = self.Minimax(self.gameState)
             self.timer+= 1
             
         return move
@@ -42,8 +42,8 @@ class Player:
         return copy
     
     # minimax algorithm for the moving phase
-    def Minimax(self,board):
-        moves = self.availableMoves(board,self.currPiecePos)
+    def Minimax(self,state):
+        moves = state.availableMoves(self.currPiecePos)
         bestMove = moves[0]
         bestScore = float('-inf')
         for move in moves:

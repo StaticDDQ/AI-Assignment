@@ -19,9 +19,12 @@ class Gamestate:
                 else:
                     self.board[col,row] = BLANK
     
+    # check if the game has ended
     def is_gameover(state):
         piece = ''
         for i in state:
+            # if there is another piece thats different, 
+            # then game is not over
             if(i=='O' or i=='@'):
                 if(piece != i):
                     return False
@@ -29,13 +32,17 @@ class Gamestate:
         return True
     
     # assumes that pos is valid, position is within bound and piece is correct
+    # adds a piece, during placing phase
     def addPiece(self,pos, piece):
         self.board[pos[0],pos[1]] = piece
         
+    # removes a piece, if a piece destroys another piece
     def removePiece(self,pos):
         self.board[pos[0],pos[1]] = BLANK
         
+    # move a piece to a new direction, during moving phase
     def movePiece(self,oldPos,newPos):
+        # get the icon of the piece
         icon = self.board[oldPos[0],oldPos[1]]
         self.board[newPos[0],newPos[1]] = icon
         self.board[oldPos[0],oldPos[1]] = BLANK
@@ -45,6 +52,7 @@ class Gamestate:
         availableMoves = []
         for row in range(minY,minY+5+1):
             for col in range(len(self.board[row])):
+                # if the position is empty
                 if(self.board[row,col] == '-'):
                     availableMoves.append((row,col))
         return availableMoves
@@ -54,13 +62,13 @@ class Gamestate:
         moves = []
         for piece in currPos:
             for direction in DIRECTIONS:
-                # a normal move to an adjacent square?
+                # a normal move to an adjacent square
                 adjacent_square = (piece[0]+direction[0],piece[1]+direction[1])
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,adjacent_square))
                     continue # a jump move is not possible in this direction
         
-                # if not, how about a jump move to the opposite square?
+                # if not, jump another square ahead
                 opposite_square = (piece[0]+2*direction[0],piece[1]+2*direction[1])
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,opposite_square))
