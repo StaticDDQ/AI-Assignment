@@ -68,6 +68,7 @@ class Player:
             
         return moves
     
+    # minimax algorithm for the moving phase
     def Minimax(self,board):
         moves = self.availableMoves(board,self.currPiecePos)
         bestMove = moves[0]
@@ -80,6 +81,7 @@ class Player:
                 bestScore = score
         return bestMove
         
+    # create a state where a piece is moved to a specific direction
     def applyMove(board,prevMove,newMove,piece):
         copy = board.copy();
         copy[prevMove] = BLANK
