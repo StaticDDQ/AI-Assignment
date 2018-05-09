@@ -1,4 +1,4 @@
-BLANK, EDGE = '-','X'
+WHITE, BLACK = '-','X','O','@'
 
 class Player:
     
@@ -10,14 +10,8 @@ class Player:
         self.timer = 0
         # Y range is (0-5) for white, else (2-7)
         self.minY = 0 if colour == 'white' else 2
-        self.icon = 'O' if colour == 'white' else '@'
-        # initiate empty board
-        self.board = {}
-        for row in range(8):
-            for col in range(8):
-                if((row == 7 and col == 7) or (row == 7 and col == 0) or
-                   (row == 0 and col == 7) or (row == 0 and col == 0)):
-                    self.board[row,col] = EDGE
-                else:
-                    self.board[row,col] = BLANK
+        self.icon = WHITE if colour == 'white' else BLACK
+        self.enemy = BLACK if self.icon == WHITE else WHITE
+        # initate empty game state
+        self.gameState = Gamestate(8)
         

@@ -4,8 +4,6 @@ BLANK, EDGE = '-','X'
 class Gamestate:
     
     def __init__(self,size):
-        self.currPiecePos = []
-        self.enemyPiecePos = []
         self.board = self.declareBoard(8)
         
     def declareBoard(self,size):

@@ -1,5 +1,4 @@
-DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
-BLANK, EDGE = '-','X'
+
 
 class Player:
     
@@ -13,15 +12,8 @@ class Player:
         self.minY = 0 if colour == 'white' else 2
         self.icon = 'O' if colour == 'white' else '@'
         self.enemy = '@' if self.icon == 'O' else 'O'
-        # initiate empty board
-        self.board = {}
-        for row in range(8):
-            for col in range(8):
-                if((row == 7 and col == 7) or (row == 7 and col == 0) or
-                   (row == 0 and col == 7) or (row == 0 and col == 0)):
-                    self.board[row,col] = EDGE
-                else:
-                    self.board[row,col] = BLANK
+        # initate empty game state
+        self.gameState = Gamestate(8)
     
     def action(self, turns):
         # first turn for player
@@ -29,7 +21,7 @@ class Player:
             return self.placeFirst()
         # during placing phase
         elif(0<turns<24):
-            move = self.availablePosition(self.board,self.minY)
+            move = self.gameState.availablePosition(self.minY)
             self.timer+= 1
         # during moving phase
         else:
@@ -41,8 +33,6 @@ class Player:
     # method in cases where player moves first, called once
     def placeFirst(self):
         return 1
-    
-
     
     # create a state where a piece is moved to a specific direction
     def applyMove(board,prevMove,newMove,piece):
@@ -87,60 +77,3 @@ class Player:
             if score > best_score:
                 best_score = score
         return best_score
-
-    
-class Gamestate:
-    
-    def __init__(self,size):
-        self.currPiecePos = []
-        self.enemyPiecePos = []
-        self.board = self.declareBoard(8)
-        
-    def declareBoard(self,size):
-        self.board = {}
-        calc = (int)((8-size)/2)
-        for row in range(calc,size+calc):
-            for col in range(calc,size+calc):
-                if((row == size+calc-1 and col == size+calc-1) or 
-                   (row == size+calc-1 and col == size+calc-1) or
-                   (row == calc and col == size-1) or 
-                   (row == calc and col == calc)):
-                    self.board[col,row] = EDGE
-                else:
-                    self.board[col,row] = BLANK
-    
-    def is_gameover(state):
-        piece = ''
-        for i in state:
-            if(i=='O' or i=='@'):
-                if(piece != i):
-                    return False
-                piece = i
-        return True
-    
-    # get available positions to place a piece for placing phase
-    def availablePosition(self,minY):
-        availableMoves = []
-        for row in range(minY,minY+5+1):
-            for col in range(len(self.board[row])):
-                if(self.board[row,col] == '-'):
-                    availableMoves.append((row,col))
-        return availableMoves
-    
-    # get available moves each piece has in moving phase
-    def availableMoves(self,currPos):
-        moves = []
-        for piece in currPos:
-            for direction in DIRECTIONS:
-                # a normal move to an adjacent square?
-                adjacent_square = (piece[0]+direction[0],piece[1]+direction[1])
-                if(adjacent_square in self.board and board[adjacent_square] == BLANK):
-                    moves.append((piece,adjacent_square))
-                    continue # a jump move is not possible in this direction
-        
-                # if not, how about a jump move to the opposite square?
-                opposite_square = (piece[0]+2*direction[0],piece[1]+2*direction[1])
-                if(adjacent_square in board and board[adjacent_square] == BLANK):
-                    moves.append((piece,opposite_square))
-            
-        return moves
