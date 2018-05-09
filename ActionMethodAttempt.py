@@ -14,21 +14,32 @@ class Player:
         self.enemy = '@' if self.icon == 'O' else 'O'
         # initate empty game state
         self.gameState = Gamestate(8)
+        # get all positions for placing phase
+        self.availablePosition = getAllPositions(self.gameState.getBoard(),self.minY)
     
     def action(self, turns):
+        self.timer += 1
         # first turn for player
         if(turns == 0):
             return self.placeFirst()
         # during placing phase
         elif(0<turns<24):
             move = self.gameState.availablePosition(self.minY)
-            self.timer+= 1
+
         # during moving phase
         else:
             move = self.Minimax(self.gameState)
-            self.timer+= 1
+
             
         return move
+    
+    def getAllPositions(board,minY):
+        availablePosition = []
+        # find all positions for player to place a piece during placing phase
+        for pos in board:
+            if(pos[1] >= minY and board[pos] == '-'):
+                availablePosition.append(pos)
+        return availablePosition
     
     # method in cases where player moves first, called once
     def placeFirst(self):

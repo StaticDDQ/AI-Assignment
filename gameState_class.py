@@ -4,7 +4,7 @@ BLANK, EDGE = '-','X'
 class Gamestate:
     
     def __init__(self,size):
-        self.board = self.declareBoard(8)
+        self.board = self.declareBoard(size)
         
     def declareBoard(self,size):
         self.board = {}
@@ -47,16 +47,6 @@ class Gamestate:
         self.board[newPos[0],newPos[1]] = icon
         self.board[oldPos[0],oldPos[1]] = BLANK
     
-    # get available positions to place a piece for placing phase
-    def availablePosition(self,minY):
-        availableMoves = []
-        for row in range(minY,minY+5+1):
-            for col in range(len(self.board[row])):
-                # if the position is empty
-                if(self.board[row,col] == '-'):
-                    availableMoves.append((row,col))
-        return availableMoves
-    
     # get available moves each piece has in moving phase
     def availableMoves(self,currPos):
         moves = []
@@ -72,7 +62,6 @@ class Gamestate:
                 opposite_square = (piece[0]+2*direction[0],piece[1]+2*direction[1])
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,opposite_square))
-            
         return moves
     
     # get current board
