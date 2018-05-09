@@ -74,3 +74,11 @@ class Gamestate:
                     moves.append((piece,opposite_square))
             
         return moves
+    
+    # get current board
+    def getBoard(self):
+        return self.board
+    
+    # set current board
+    def setBoard(self,newBoard):
+        self.board = newBoard
