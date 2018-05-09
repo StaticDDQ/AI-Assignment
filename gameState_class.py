@@ -28,6 +28,18 @@ class Gamestate:
                 piece = i
         return True
     
+    # assumes that pos is valid, position is within bound and piece is correct
+    def addPiece(self,pos, piece):
+        self.board[pos[0],pos[1]] = piece
+        
+    def removePiece(self,pos):
+        self.board[pos[0],pos[1]] = BLANK
+        
+    def movePiece(self,oldPos,newPos):
+        icon = self.board[oldPos[0],oldPos[1]]
+        self.board[newPos[0],newPos[1]] = icon
+        self.board[oldPos[0],oldPos[1]] = BLANK
+    
     # get available positions to place a piece for placing phase
     def availablePosition(self,minY):
         availableMoves = []
