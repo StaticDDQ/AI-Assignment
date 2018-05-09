@@ -12,6 +12,7 @@ class Player:
         # Y range is (0-5) for white, else (2-7)
         self.minY = 0 if colour == 'white' else 2
         self.icon = 'O' if colour == 'white' else '@'
+        self.enemy = '@' if self.icon == 'O' else 'O'
         # initiate empty board
         self.board = {}
         for row in range(8):
@@ -68,6 +69,13 @@ class Player:
             
         return moves
     
+    # create a state where a piece is moved to a specific direction
+    def applyMove(board,prevMove,newMove,piece):
+        copy = board.copy();
+        copy[prevMove] = BLANK
+        copy[newMove] = piece
+        return copy
+    
     # minimax algorithm for the moving phase
     def Minimax(self,board):
         moves = self.availableMoves(board,self.currPiecePos)
@@ -81,38 +89,36 @@ class Player:
                 bestScore = score
         return bestMove
         
-    # create a state where a piece is moved to a specific direction
-    def applyMove(board,prevMove,newMove,piece):
-        copy = board.copy();
-        copy[prevMove] = BLANK
-        copy[newMove] = piece
-        return copy
-        
-    def min_play(game_state):
-        if game_state.is_gameover():
+    def min_play(self,state):
+        if(self.is_gameover(state)):
             return evaluate(game_state)
-        moves = game_state.get_available_moves()
+        moves = self.availableMoves(state,self.enemyPiecePos)
         best_score = float('inf')
         for move in moves:
-            clone = game_state.next_state(move)
-            score = max_play(clone)
+            clone = self.applyMove(state,move[0],move[1],self.enemys)
+            score = self.max_play(clone)
             if score < best_score:
-                best_move = move
                 best_score = score
         return best_score
     
-    def max_play(game_state):
-        if game_state.is_gameover():
+    def max_play(self,state):
+        if(self.is_gameover(state)):
             return evaluate(game_state)
-        moves = game_state.get_available_moves()
+        moves = self.availableMoves(state,self.currPiecePos)
         best_score = float('-inf')
         for move in moves:
-            clone = game_state.next_state(move)
-            score = min_play(clone)
+            clone = self.applyMove(state,move[0],move[1],self.icon)
+            score = self.min_play(clone)
             if score > best_score:
-                best_move = move
                 best_score = score
         return best_score
-        
-        
-        
+    
+    def is_gameover(state):
+        piece = ''
+        for i in state:
+            if(i=='O' or i=='@'):
+                if(piece != i):
+                    return False
+                piece = i
+        return True
+            
