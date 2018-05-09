@@ -34,20 +34,13 @@ class Player:
     def placeFirst(self):
         return 1
     
-    # create a state where a piece is moved to a specific direction
-    def applyMove(board,prevMove,newMove,piece):
-        copy = board.copy();
-        copy[prevMove] = BLANK
-        copy[newMove] = piece
-        return copy
-    
     # minimax algorithm for the moving phase
     def Minimax(self,state):
         moves = state.availableMoves(self.currPiecePos)
         bestMove = moves[0]
         bestScore = float('-inf')
         for move in moves:
-            clone = self.applyMove(board,move[0],move[1],self.icon)
+            clone = # create a copy of the state where player moves
             score = self.min_play(clone)
             if score < bestScore:
                 bestMove = move
@@ -60,7 +53,7 @@ class Player:
         moves = self.availableMoves(state,self.enemyPiecePos)
         best_score = float('inf')
         for move in moves:
-            clone = self.applyMove(state,move[0],move[1],self.enemys)
+            clone = # create copy of an enemy moving a piece
             score = self.max_play(clone)
             if score < best_score:
                 best_score = score
@@ -72,8 +65,11 @@ class Player:
         moves = self.availableMoves(state,self.currPiecePos)
         best_score = float('-inf')
         for move in moves:
-            clone = self.applyMove(state,move[0],move[1],self.icon)
+            clone = # create copy of the player moving a piece
             score = self.min_play(clone)
             if score > best_score:
                 best_score = score
         return best_score
+
+    def evaluate(state):
+        

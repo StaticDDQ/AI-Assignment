@@ -29,7 +29,7 @@ class Gamestate:
                 if(piece != i):
                     return False
                 piece = i
-        return True
+        return True  
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
