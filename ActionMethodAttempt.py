@@ -109,7 +109,7 @@ class Player:
 #==============================================================================
   
 # GameState Class
-DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+DIRECTIONS = [(1, 0), (0, 1), (-1, 0), (0, 1)]
 BLANK, CORNER = '-','X' #Initialized at top, might remove if file splitting can read const from player.py
 
 class Gamestate:
