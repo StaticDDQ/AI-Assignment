@@ -80,7 +80,7 @@ class Player:
         return bestMove
         
     def min_play(self,state,size):
-        if(state.is_gameover(state)):
+        if(state.isGameOver(state)):
             return self.evaluate(state)
         moves = self.availableMoves(state,self.enemyPiecePos)
         best_score = float('inf')
@@ -92,7 +92,7 @@ class Player:
         return best_score
     
     def max_play(self,state,size):
-        if(state.is_gameover(state)):
+        if(state.isGameOver(state)):
             return self.evaluate(state)
         moves = self.availableMoves(state,self.currPiecePos)
         best_score = float('-inf')
@@ -105,7 +105,7 @@ class Player:
 
     # rough evaluation function
     def evaluate(self,state):
-        return float('inf') if(state.getWinner() == self.icon) else float('-inf')
+        return float('inf') if(state.getWinner() == self.icon) else float('-inf')		
     
 #==============================================================================
   
@@ -135,7 +135,7 @@ class Gamestate:
                     self.board[col,row] = BLANK
     
     # check if the game has ended
-    def is_gameover(self,state):
+    def isGameOver(self,state):
         piece = ''
         for i in state:
             # if there is another piece thats different, 
@@ -189,6 +189,7 @@ class Gamestate:
     def getWinner(self):
         return self.winner
     
+	# add kills from shrinking
 	def updateKills(self):
 		for piece in getPieces():
 			enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
@@ -196,18 +197,59 @@ class Gamestate:
 			
 			# checks x-axis, then y-axis
 			for axis in range(0,2):
-				if origin <= piece[axis] <= origin+self.size:
+				if origin < piece[axis] < origin+self.size:
 					posAxis = self.board[sumTuples(zip(piece, DIRECTIONS[axis]))
 					negAxis = self.board[sumTuples(zip(piece, DIRECTIONS[axis+2]))
 					if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
 						removePiece(piece)
 	
-	# return array of all existing pieces on board				
-	def getPieces(self):
+	# return array of all pieces of specified colour existing on board
+	def getPieces(self, colour="Both"):
 		pieces = []
 		origin = (int)((8-self.size)/2) # in case board has shrunk
 		for row in range(origin, origin+self.size):
 			for col in range(origin, origin+self.size):
-				if self.board[row, col] == WHITE orself.board[row, col] == BLACK:
-					pieces.append((row, col))
+				if colour == "Both":
+					if self.board[row, col] == WHITE or self.board[row, col] == BLACK:
+				else:
+					if self.board[row, col] == colour:
+						pieces.append((row, col))
 		return pieces
+		
+	def eval(self, colour):
+		enemy = BLACK if colour == WHITE else WHITE
+		playerPieces = getPieces(colour)
+		enemyPieces = getPieces(enemy)
+		score = 0;
+		origin = (int)((8-self.size)/2) # in case board has shrunk
+		
+		for piece in playerPieces:
+			vulnerableCount = 0;
+			vulnerableSum = 0;
+			for axis in range(0,2):
+				if origin < piece[axis] < origin+self.size:
+					posAxis = self[sumTuples(zip(piece, DIRECTIONS[axis]))
+					negAxis = self[sumTuples(zip(piece, DIRECTIONS[axis+2]))
+					if !(posAxis == colour or negAxis == colour):
+						vulnerableCount += 1
+						vulnerableSum += (int(posAxis == CORNER or posAxis == enemy) + int(negAxis == CORNER or negAxis == enemy))*0.5
+			vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount == 0 else 0
+			vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
+			score -= vulnerableWeighted
+		
+		# GOTTA FIX, MAKE NEW FUNCTION SO NO COPYPASTA
+		for piece in enemyPieces:
+			vulnerableCount = 0;
+			vulnerableSum = 0;
+			for axis in range(0,2):
+				if origin < piece[axis] < origin+self.size:
+					posAxis = self[sumTuples(zip(piece, DIRECTIONS[axis]))
+					negAxis = self[sumTuples(zip(piece, DIRECTIONS[axis+2]))
+					if !(posAxis == enemy or negAxis == enemy):
+						vulnerableCount += 1
+						vulnerableSum += (int(posAxis == CORNER or posAxis == colour) + int(negAxis == CORNER or negAxis == colour))*0.5
+			vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount == 0 else 0
+			vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
+			score += vulnerableWeighted
+			
+		return score
