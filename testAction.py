@@ -80,7 +80,7 @@ class Player:
                     for move in moves:
                         # create follow-up state
                         nextState = self.createNextState(state,move)
-                        score = self.minimax(nextState,size,layer-1,not maximizer,timer+1)[0]
+                        score = self.minimax(nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
                         if(score > bestScore):
                             bestScore = score
                             bestMove = move
@@ -88,21 +88,21 @@ class Player:
                         # Alphabeta bookkeeping:
                         if(bestScore > floor):
                             floor = bestScore   # Constrains children at the next (minimizing) layer to be above this value
-                        if(bestScore >= ceiling): # No need to search any more if we've crossed the upper limit at this max layer already
+                        if(bestScore >= ceiling): # Stop searching any more if it's above the upper limit
                             break
                 else:
                     bestScore = float('inf')
                     bestMove = moves[0]
                     for move in moves:
                         nextState = self.createNextState(state,move)
-                        score = self.minimax(nextState,size,layer-1,not maximizer,timer+1)[0]
+                        score = self.minimax(nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
                         if(score < bestScore):
                             bestScore = score
                             bestMove = move
                             
                         if(bestScore < ceiling):
                             ceiling = bestScore   # Constrains children at the next (maximizing) layer to be below this value
-                        if(bestScore <= floor): # No need to search any more if we've crossed the lower limit at this min layer already
+                        if(bestScore <= floor): # Stop searching any more if it's below the lower limit
                             break
             else:
                 bestScore = self.evaluate(state)
