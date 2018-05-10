@@ -1,5 +1,5 @@
 
-
+# Player Class
 class Player:
     
     def __init__(self, colour):
@@ -45,42 +45,122 @@ class Player:
     def placeFirst(self):
         return 1
     
+    def nextState(move,size):
+        state = GameState(size)
+        state.movePiece(move[0],move[1])
+        return state
+    
     # minimax algorithm for the moving phase
-    def Minimax(self,state):
+    def Minimax(self,state,size):
         moves = state.availableMoves(self.currPiecePos)
         bestMove = moves[0]
         bestScore = float('-inf')
         for move in moves:
-            clone = # create a copy of the state where player moves
-            score = self.min_play(clone)
+            clone = self.nextState(move,size)
+            score = self.min_play(clone,size)
             if score < bestScore:
                 bestMove = move
                 bestScore = score
         return bestMove
         
-    def min_play(self,state):
-        if(self.is_gameover(state)):
-            return evaluate(game_state)
+    def min_play(self,state,size):
+        if(state.is_gameover(state)):
+            return self.evaluate(state)
         moves = self.availableMoves(state,self.enemyPiecePos)
         best_score = float('inf')
         for move in moves:
-            clone = # create copy of an enemy moving a piece
-            score = self.max_play(clone)
+            clone = self.nextState(move,size)
+            score = self.max_play(clone,size)
             if score < best_score:
                 best_score = score
         return best_score
     
-    def max_play(self,state):
-        if(self.is_gameover(state)):
-            return evaluate(game_state)
+    def max_play(self,state,size):
+        if(state.is_gameover(state)):
+            return self.evaluate(state)
         moves = self.availableMoves(state,self.currPiecePos)
         best_score = float('-inf')
         for move in moves:
-            clone = # create copy of the player moving a piece
-            score = self.min_play(clone)
+            clone = self.nextState(move,size)
+            score = self.min_play(clone,size)
             if score > best_score:
                 best_score = score
         return best_score
 
-    def evaluate(state):
+    def evaluate(self,state):
+        return float('inf') if(state.getWinner() == self.icon) else float('-inf')
+    
+#==============================================================================
+  
+# GameState Class
+DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+BLANK, EDGE = '-','X'
+
+class Gamestate:
+    
+    def __init__(self,size):
+        self.board = self.declareBoard(size)
+        self.winner = ''
         
+    def declareBoard(self,size):
+        self.board = {}
+        calc = (int)((8-size)/2)
+        for row in range(calc,size+calc):
+            for col in range(calc,size+calc):
+                if((row == size+calc-1 and col == size+calc-1) or 
+                   (row == size+calc-1 and col == size+calc-1) or
+                   (row == calc and col == size-1) or 
+                   (row == calc and col == calc)):
+                    self.board[col,row] = EDGE
+                else:
+                    self.board[col,row] = BLANK
+    
+    # check if the game has ended
+    def is_gameover(self,state):
+        piece = ''
+        for i in state:
+            # if there is another piece thats different, 
+            # then game is not over
+            if(i=='O' or i=='@'):
+                if(piece != i):
+                    return False
+                piece = i
+        self.winner = piece
+        return True
+    
+    # assumes that pos is valid, position is within bound and piece is correct
+    # adds a piece, during placing phase
+    def addPiece(self,pos, piece):
+        self.board[pos[0],pos[1]] = piece
+        
+    # removes a piece, if a piece destroys another piece
+    def removePiece(self,pos):
+        self.board[pos[0],pos[1]] = BLANK
+        
+    # move a piece to a new direction, during moving phase
+    def movePiece(self,oldPos,newPos):
+        # get the icon of the piece
+        icon = self.board[oldPos[0],oldPos[1]]
+        self.board[newPos[0],newPos[1]] = icon
+        self.board[oldPos[0],oldPos[1]] = BLANK
+    
+    # get available moves each piece has in moving phase
+    def availableMoves(self,currPos):
+        moves = []
+        for piece in currPos:
+            for direction in DIRECTIONS:
+                # a normal move to an adjacent square
+                adjacent_square = (piece[0]+direction[0],piece[1]+direction[1])
+                if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
+                    moves.append((piece,adjacent_square))
+                    continue # a jump move is not possible in this direction
+        
+                # if not, jump another square ahead
+                opposite_square = (piece[0]+2*direction[0],piece[1]+2*direction[1])
+                if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
+                    moves.append((piece,opposite_square))
+        return moves
+    
+    def getWinner(self):
+        return self.winner
+    

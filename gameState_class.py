@@ -5,6 +5,7 @@ class Gamestate:
     
     def __init__(self,size):
         self.board = self.declareBoard(size)
+        self.winner = ''
         
     def declareBoard(self,size):
         self.board = {}
@@ -20,7 +21,7 @@ class Gamestate:
                     self.board[col,row] = BLANK
     
     # check if the game has ended
-    def is_gameover(state):
+    def is_gameover(self,state):
         piece = ''
         for i in state:
             # if there is another piece thats different, 
@@ -29,7 +30,8 @@ class Gamestate:
                 if(piece != i):
                     return False
                 piece = i
-        return True  
+        self.winner = piece
+        return True
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
@@ -64,10 +66,5 @@ class Gamestate:
                     moves.append((piece,opposite_square))
         return moves
     
-    # get current board
-    def getBoard(self):
-        return self.board
-    
-    # set current board
-    def setBoard(self,newBoard):
-        self.board = newBoard
+    def getWinner(self):
+        return self.winner
