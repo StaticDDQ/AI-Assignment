@@ -171,13 +171,13 @@ class Gamestate:
         for piece in currPos:
             for direction in DIRECTIONS:
                 # a normal move to an adjacent square
-                adjacent_square = sumTuples(zip(piece, direction))
+                adjacent_square = self.sumTuples(zip(piece, direction))
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,adjacent_square))
                     continue # a jump move is not possible in this direction
         
                 # if not, jump another square ahead
-                opposite_square = sumTuples(zip(piece, direction, direction))
+                opposite_square = self.sumTuples(zip(piece, direction, direction))
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,opposite_square))
         return moves
@@ -191,17 +191,23 @@ class Gamestate:
     
 	# add kills from shrinking
 	def updateKills(self):
-		for piece in getPieces():
+		for piece in self.getPieces():
 			enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
 			origin = (int)((8-self.size)/2)
 			
 			# checks x-axis, then y-axis
 			for axis in range(0,2):
+			
+				# killed by surrounding enemies
 				if origin < piece[axis] < origin+self.size:
-					posAxis = self.board[sumTuples(zip(piece, DIRECTIONS[axis]))
-					negAxis = self.board[sumTuples(zip(piece, DIRECTIONS[axis+2]))
+					posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
+					negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
 					if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
-						removePiece(piece)
+						self.removePiece(piece)
+						
+				# killed by board shrinking
+				else if piece[axis] < origin or piece[axis] > origin+self.size:
+					self.removePiece(piece)
 	
 	# return array of all pieces of specified colour existing on board
 	def getPieces(self, colour="Both"):
@@ -219,15 +225,15 @@ class Gamestate:
 	# returns score for minimax evaluation of board state
 	def eval(self, colour):
 		enemy = BLACK if colour == WHITE else WHITE
-		playerPieces = getPieces(colour)
-		enemyPieces = getPieces(enemy)
+		playerPieces = self.getPieces(colour)
+		enemyPieces = self.getPieces(enemy)
 		score = 0;
 		
 		# Score = Enemy Vulnerability - Player Vulnerability
 		for piece in playerPieces:
-			score -= calcVulnerability(piece, colour, enemy)
+			score -= self.calcVulnerability(piece, colour, enemy)
 		for piece in enemyPieces:
-			score += calcVulnerability(piece, enemy, colour)
+			score += self.calcVulnerability(piece, enemy, colour)
 			
 		return score
 	
@@ -243,8 +249,8 @@ class Gamestate:
 			if origin < piece[axis] < origin+self.size:
 			
 				# tiles beside piece
-				posAxis = self[sumTuples(zip(piece, DIRECTIONS[axis]))
-				negAxis = self[sumTuples(zip(piece, DIRECTIONS[axis+2]))
+				posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
+				negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
 				
 				# piece is safe in that axis if at least one friendly piece beside, can't be surrounded
 				if !(posAxis == colour or negAxis == colour):
