@@ -11,7 +11,7 @@ class Player:
         self.timer = 0
         # Y range is (0-5) for white, else (2-7)
         self.minY = 0 if colour == 'white' else 2
-        self.icon = 'O' if colour == 'white' else '@'
+        self.icon = WHITE if colour == 'white' else BLACK
         # initate empty game state
         self.gameState = Gamestate(8)
         # get all positions for placing phase
@@ -40,7 +40,7 @@ class Player:
         availablePosition = []
         # find all positions for player to place a piece during placing phase
         for pos in board:
-            if(pos[1] >= minY and board[pos] == '-'):
+            if(pos[1] >= minY and board[pos] == BLANK):
                 availablePosition.append(pos)
         return availablePosition
     
@@ -80,14 +80,17 @@ class Player:
         
         # if there are available moves
         if(len(moves)>0):
+            # if there is still a layer in the tree
             if(layer > 0):
+                # if current player is a Maximiser
                 if(maximizer):
+                    # set to be as low as possible
                     bestScore = float('-inf')
                     bestMove = moves[0]
                     for move in moves:
                         # create follow-up state
                         nextState = self.createNextState(state,size,move)
-                        
+                        # switch players
                         icon = WHITE if icon == BLACK else BLACK
                         
                         score = self.abPruing(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
@@ -101,6 +104,7 @@ class Player:
                         if(bestScore >= ceiling): # Stop searching any more if it's above the upper limit
                             break
                 else:
+                    # set to be as high as possible
                     bestScore = float('inf')
                     bestMove = moves[0]
                     for move in moves:
@@ -161,7 +165,7 @@ class Gamestate:
         for i in self.board:
             # if there is another piece thats different, 
             # then game is not over
-            if(i=='O' or i=='@'):
+            if(i==WHITE or i==BLACK):
                 if(piece != i):
                     return False
                 piece = i
@@ -205,84 +209,86 @@ class Gamestate:
                     moves.append((piece,opposite_square))
         return moves
 	
-	# sums up set of zipped tuples
-	def sumTuples(zipped):
-		return tuple([sum(x) for x in zipped])
+    # sums up set of zipped tuples
+    def sumTuples(zipped):
+        return tuple([sum(x) for x in zipped])
     
-	# add kills from shrinking
-	def updateKills(self):
-		for piece in self.getPieces():
-			enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
-			origin = (int)((8-self.size)/2)
+    # add kills from shrinking
+    def updateKills(self):
+        totalPieces = self.whitePieces+self.blacPieces
+        for piece in totalPieces:
+            enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
+            origin = (int)((8-self.size)/2)
 			
-			# checks x-axis, then y-axis
-			for axis in range(0,2):
+            # checks x-axis, then y-axis
+            for axis in range(0,2):
 			
 				# killed by surrounding enemies
-				if origin < piece[axis] < origin+self.size:
-					posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
-					negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
-					if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
-						self.removePiece(piece)
+                if origin < piece[axis] < origin+self.size:
+                    posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
+                    negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
+                    if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
+                        self.removePiece(piece)
 						
-				# killed by board shrinking
-				else if piece[axis] < origin or piece[axis] > origin+self.size:
-					self.removePiece(piece)
+            # killed by board shrinking
+                else if piece[axis] < origin or piece[axis] > origin+self.size:
+                    self.removePiece(piece)
 	
-	# return array of all pieces of specified colour existing on board
-	def getPieces(self, colour="Both"):
-		pieces = []
-		origin = (int)((8-self.size)/2) # in case board has shrunk
-		for row in range(origin, origin+self.size):
-			for col in range(origin, origin+self.size):
-				if colour == "Both":
-					if self.board[row, col] == WHITE or self.board[row, col] == BLACK:
-				else:
-					if self.board[row, col] == colour:
-						pieces.append((row, col))
-		return pieces
+    # return array of all pieces of specified colour existing on board
+    def getPieces(self, colour="Both"):
+        pieces = []
+        origin = (int)((8-self.size)/2) # in case board has shrunk
+        for row in range(origin, origin+self.size):
+            for col in range(origin, origin+self.size):
+                if colour == "Both":
+                    if(self.board[row, col] == WHITE or self.board[row, col] == BLACK):
+                        pieces.append((col, row))
+                else:
+                    if(self.board[row, col] == colour):
+                        pieces.append((col, row))
+        return pieces
 	
-	# returns score for minimax evaluation of board state
-	def eval(self, colour):
-		enemy = BLACK if colour == WHITE else WHITE
-		playerPieces = self.getPieces(colour)
-		enemyPieces = self.getPieces(enemy)
-		score = 0;
+    # returns score for minimax evaluation of board state
+    def eval(self, colour):
+        enemy = BLACK if colour == WHITE else WHITE
+        playerPieces = self.whitePieces if enemy == BLACK else self.blackPieces
+        enemyPieces = self.whitePieces if enemy == WHITE else self.blackPieces
+        score = 0;
 		
-		# Score = Enemy Vulnerability - Player Vulnerability
-		for piece in playerPieces:
-			score -= self.calcVulnerability(piece, colour, enemy)
-		for piece in enemyPieces:
-			score += self.calcVulnerability(piece, enemy, colour)
+        # Score = Enemy Vulnerability - Player Vulnerability
+        for piece in playerPieces:
+            score -= self.calcVulnerability(piece, colour, enemy)
+        for piece in enemyPieces:
+            score += self.calcVulnerability(piece, enemy, colour)
 			
-		return score
+        return score
 	
-	def calcVulnerability(self, piece, colour, enemy):
-		vulnerableCount = 0;
-		vulnerableSum = 0;
-		origin = (int)((8-self.size)/2) # in case board has shrunk
+    def calcVulnerability(self, piece, colour, enemy):
+        vulnerableCount = 0;
+        vulnerableSum = 0;
+        origin = (int)((8-self.size)/2) # in case board has shrunk
 		
-		# check vulnerability horizontally and vertically
-		for axis in range(0,2):
+        # check vulnerability horizontally and vertically
+        for axis in range(0,2):
 		
-			# piece is safe in that axis is sticking to the edge
-			if origin < piece[axis] < origin+self.size:
+            # piece is safe in that axis is sticking to the edge
+            if origin < piece[axis] < origin+self.size:
 			
-				# tiles beside piece
-				posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
-				negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
+                # tiles beside piece
+                posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
+                negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
 				
-				# piece is safe in that axis if at least one friendly piece beside, can't be surrounded
-				if !(posAxis == colour or negAxis == colour):
-					vulnerableCount += 1
-					# Vulnerability = # of enemy pieces surrounding piece * 0.5
-					# Eg: 0 = no pieces, 0.5 = 1 enemy piece, 1 = killed
-					vulnerableSum += (int(posAxis == CORNER or posAxis == enemy) + int(negAxis == CORNER or negAxis == enemy))*0.5
+                # piece is safe in that axis if at least one friendly piece beside, can't be surrounded
+                if !(posAxis == colour or negAxis == colour):
+                    vulnerableCount += 1
+                    # Vulnerability = # of enemy pieces surrounding piece * 0.5
+                    # Eg: 0 = no pieces, 0.5 = 1 enemy piece, 1 = killed
+                    vulnerableSum += (int(posAxis == CORNER or posAxis == enemy) + int(negAxis == CORNER or negAxis == enemy))*0.5
 				
-		vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount != 0 else 0
-		# Level of vulnerability has 3 times higher priority than number of vulnerable axes
-		vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
-		return vulnerableWeighted
+        vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount != 0 else 0
+        # Level of vulnerability has 3 times higher priority than number of vulnerable axes
+        vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
+        return vulnerableWeighted
     
     def getSize(self):
         return self.size
