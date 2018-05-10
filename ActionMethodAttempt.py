@@ -222,7 +222,6 @@ class Gamestate:
 		playerPieces = getPieces(colour)
 		enemyPieces = getPieces(enemy)
 		score = 0;
-		origin = (int)((8-self.size)/2) # in case board has shrunk
 		
 		# Score = Enemy Vulnerability - Player Vulnerability
 		for piece in playerPieces:
@@ -235,6 +234,7 @@ class Gamestate:
 	def calcVulnerability(self, piece, colour, enemy):
 		vulnerableCount = 0;
 		vulnerableSum = 0;
+		origin = (int)((8-self.size)/2) # in case board has shrunk
 		
 		# check vulnerability horizontally and vertically
 		for axis in range(0,2):
