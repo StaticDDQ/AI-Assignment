@@ -49,9 +49,12 @@ class Player:
         return 1
     
     # make a copy of the next state when it makes a move
-    def createNextState(state,move):
+    def createNextState(state,size,move):
         # copy current state
         tempState = deepcopy(state)
+        # check if the board shrinks
+        if(tempState.getSize() != size):
+            tempState.declareBoard(size)
         tempState.movePiece(move[0],move[1])
         ''' update state in case when something gets destroyed'''
         return tempState
@@ -83,7 +86,7 @@ class Player:
                     bestMove = moves[0]
                     for move in moves:
                         # create follow-up state
-                        nextState = self.createNextState(state,move)
+                        nextState = self.createNextState(state,size,move)
                         
                         icon = WHITE if icon == BLACK else BLACK
                         
@@ -101,7 +104,7 @@ class Player:
                     bestScore = float('inf')
                     bestMove = moves[0]
                     for move in moves:
-                        nextState = self.createNextState(state,move)
+                        nextState = self.createNextState(state,size,move)
                         
                         icon = WHITE if icon == BLACK else BLACK
                         
@@ -133,7 +136,6 @@ BLANK, CORNER = '-','X' #Initialized at top, might remove if file splitting can 
 class Gamestate:
     
     def __init__(self,size):
-        self.size = size
         self.board = self.declareBoard(size)
         self.winner = ''
         self.whitePieces = []
