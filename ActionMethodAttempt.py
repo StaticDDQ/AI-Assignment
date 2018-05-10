@@ -215,7 +215,8 @@ class Gamestate:
 					if self.board[row, col] == colour:
 						pieces.append((row, col))
 		return pieces
-		
+	
+	# returns score for minimax evaluation of board state
 	def eval(self, colour):
 		enemy = BLACK if colour == WHITE else WHITE
 		playerPieces = getPieces(colour)
@@ -223,33 +224,36 @@ class Gamestate:
 		score = 0;
 		origin = (int)((8-self.size)/2) # in case board has shrunk
 		
+		# Score = Enemy Vulnerability - Player Vulnerability
 		for piece in playerPieces:
-			vulnerableCount = 0;
-			vulnerableSum = 0;
-			for axis in range(0,2):
-				if origin < piece[axis] < origin+self.size:
-					posAxis = self[sumTuples(zip(piece, DIRECTIONS[axis]))
-					negAxis = self[sumTuples(zip(piece, DIRECTIONS[axis+2]))
-					if !(posAxis == colour or negAxis == colour):
-						vulnerableCount += 1
-						vulnerableSum += (int(posAxis == CORNER or posAxis == enemy) + int(negAxis == CORNER or negAxis == enemy))*0.5
-			vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount == 0 else 0
-			vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
-			score -= vulnerableWeighted
-		
-		# GOTTA FIX, MAKE NEW FUNCTION SO NO COPYPASTA
+			score -= calcVulnerability(piece, colour, enemy)
 		for piece in enemyPieces:
-			vulnerableCount = 0;
-			vulnerableSum = 0;
-			for axis in range(0,2):
-				if origin < piece[axis] < origin+self.size:
-					posAxis = self[sumTuples(zip(piece, DIRECTIONS[axis]))
-					negAxis = self[sumTuples(zip(piece, DIRECTIONS[axis+2]))
-					if !(posAxis == enemy or negAxis == enemy):
-						vulnerableCount += 1
-						vulnerableSum += (int(posAxis == CORNER or posAxis == colour) + int(negAxis == CORNER or negAxis == colour))*0.5
-			vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount == 0 else 0
-			vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
-			score += vulnerableWeighted
+			score += calcVulnerability(piece, enemy, colour)
 			
 		return score
+	
+	def calcVulnerability(self, piece, colour, enemy):
+		vulnerableCount = 0;
+		vulnerableSum = 0;
+		
+		# check vulnerability horizontally and vertically
+		for axis in range(0,2):
+		
+			# piece is safe in that axis is sticking to the edge
+			if origin < piece[axis] < origin+self.size:
+			
+				# tiles beside piece
+				posAxis = self[sumTuples(zip(piece, DIRECTIONS[axis]))
+				negAxis = self[sumTuples(zip(piece, DIRECTIONS[axis+2]))
+				
+				# piece is safe in that axis if at least one friendly piece beside, can't be surrounded
+				if !(posAxis == colour or negAxis == colour):
+					vulnerableCount += 1
+					# Vulnerability = # of enemy pieces surrounding piece * 0.5
+					# Eg: 0 = no pieces, 0.5 = 1 enemy piece, 1 = killed
+					vulnerableSum += (int(posAxis == CORNER or posAxis == enemy) + int(negAxis == CORNER or negAxis == enemy))*0.5
+				
+		vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount != 0 else 0
+		# Level of vulnerability has 3 times higher priority than number of vulnerable axes
+		vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
+		return vulnerableWeighted
