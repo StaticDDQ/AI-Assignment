@@ -1,4 +1,5 @@
 from copy import deepcopy
+import numpy
 
 WHITE, BLACK, BLANK, CORNER = 'O', '@', '-', 'X'
 
@@ -109,7 +110,8 @@ class Player:
 #==============================================================================
   
 # GameState Class
-DIRECTIONS = [(1, 0), (0, 1), (-1, 0), (0, 1)]
+RIGHT, UP, LEFT, DOWN = (1, 0), (0, 1), (-1, 0), (0, 1)
+DIRECTIONS = [RIGHT, UP, LEFT, DOWN]
 BLANK, CORNER = '-','X' #Initialized at top, might remove if file splitting can read const from player.py
 
 class Gamestate:
@@ -144,6 +146,8 @@ class Gamestate:
                 piece = i
         self.winner = piece
         return True
+		
+	def shrinkBoard(self)
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
@@ -167,24 +171,36 @@ class Gamestate:
         for piece in currPos:
             for direction in DIRECTIONS:
                 # a normal move to an adjacent square
-                adjacent_square = (piece[0]+direction[0],piece[1]+direction[1])
+                adjacent_square = sumTuples(zip(piece, direction))
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,adjacent_square))
                     continue # a jump move is not possible in this direction
         
                 # if not, jump another square ahead
-                opposite_square = (piece[0]+2*direction[0],piece[1]+2*direction[1])
+                opposite_square = sumTuples(zip(piece, direction, direction))
                 if(adjacent_square in self.board and self.board[adjacent_square] == BLANK):
                     moves.append((piece,opposite_square))
         return moves
+	
+	# sums up set of zipped tuples
+	def sumTuples(zipped):
+		return tuple([sum(x) for x in zipped])
     
     def getWinner(self):
         return self.winner
     
 	def updateKills(self):
 		for piece in getPieces():
-			enemy = BLACK if self.board[piece[1],piece[2]] == WHITE else WHITE
+			enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
+			origin = (int)((8-self.size)/2)
 			
+			# checks x-axis, then y-axis
+			for axis in range(0,2):
+				if origin <= piece[axis] <= origin+self.size:
+					posAxis = self.board[sumTuples(zip(piece, DIRECTIONS[axis]))
+					negAxis = self.board[sumTuples(zip(piece, DIRECTIONS[axis+2]))
+					if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
+						removePiece(piece)
 	
 	# return array of all existing pieces on board				
 	def getPieces(self):
