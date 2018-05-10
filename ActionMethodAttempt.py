@@ -52,11 +52,18 @@ class Player:
     
     # minimax algorithm for the moving phase
     def Minimax(self,state,size):
+        # get all moves for each piece
         moves = state.availableMoves(self.currPiecePos)
+        # set initial move as best move
         bestMove = moves[0]
+        # set lowest possible score
         bestScore = float('-inf')
+        # iterate through each move, apply each move to a state and get
+        # the score, if score is the highest, return best move
         for move in moves:
+            # apply move to a state, returns a copy
             clone = self.nextState(move,size)
+            # use that copy to determine the score
             score = self.min_play(clone,size)
             if score < bestScore:
                 bestMove = move
@@ -87,6 +94,7 @@ class Player:
                 best_score = score
         return best_score
 
+    # rough evaluation function
     def evaluate(self,state):
         return float('inf') if(state.getWinner() == self.icon) else float('-inf')
     
