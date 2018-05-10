@@ -29,7 +29,6 @@ class Player:
         # during moving phase
         else:
             move = self.Minimax(self.gameState)
-
             
         return move
     
@@ -45,7 +44,9 @@ class Player:
     def placeFirst(self):
         return 1
     
+    # make a copy of the next state when it makes a move
     def nextState(state,move):
+        # copy current state
         tempState = deepcopy(state)
         tempState.movePiece(move[0],move[1])
         return tempState
@@ -171,10 +172,4 @@ class Gamestate:
     
     def getWinner(self):
         return self.winner
-    
-    def getBoard(self):
-        return self.board
-
-    def setBoard(newBoard):
-        self.board = newBoard
     

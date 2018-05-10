@@ -1,3 +1,4 @@
+# GameState Class
 DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 BLANK, EDGE = '-','X'
 
