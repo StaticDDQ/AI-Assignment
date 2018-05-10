@@ -1,4 +1,7 @@
 from copy import deepcopy
+
+WHITE, BLACK, BLANK, CORNER = 'O', '@', '-', 'X'
+
 # Player Class
 class Player:
     
@@ -31,6 +34,10 @@ class Player:
             move = self.Minimax(self.gameState)
             
         return move
+	
+	def update(self, action):
+		self.gameState.movePiece(action[0], action[1])
+		self.gameState.updateKills()
     
     def getAllPositions(board,minY):
         availablePosition = []
@@ -103,24 +110,25 @@ class Player:
   
 # GameState Class
 DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
-BLANK, EDGE = '-','X'
+BLANK, CORNER = '-','X' #Initialized at top, might remove if file splitting can read const from player.py
 
 class Gamestate:
     
     def __init__(self,size):
+		self.size = size
         self.board = self.declareBoard(size)
         self.winner = ''
         
     def declareBoard(self,size):
         self.board = {}
-        calc = (int)((8-size)/2)
+        calc = (int)((8-size)/2) # in case board has shrunk
         for row in range(calc,size+calc):
             for col in range(calc,size+calc):
                 if((row == size+calc-1 and col == size+calc-1) or 
                    (row == size+calc-1 and col == size+calc-1) or
                    (row == calc and col == size-1) or 
                    (row == calc and col == calc)):
-                    self.board[col,row] = EDGE
+                    self.board[col,row] = CORNER
                 else:
                     self.board[col,row] = BLANK
     
@@ -173,3 +181,17 @@ class Gamestate:
     def getWinner(self):
         return self.winner
     
+	def updateKills(self):
+		for piece in getPieces():
+			enemy = BLACK if self.board[piece[1],piece[2]] == WHITE else WHITE
+			
+	
+	# return array of all existing pieces on board				
+	def getPieces(self):
+		pieces = []
+		origin = (int)((8-self.size)/2) # in case board has shrunk
+		for row in range(origin, origin+self.size):
+			for col in range(origin, origin+self.size):
+				if self.board[row, col] == WHITE orself.board[row, col] == BLACK:
+					pieces.append((row, col))
+		return pieces
