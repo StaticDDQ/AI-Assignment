@@ -28,7 +28,7 @@ class Player:
 
         # during moving phase
         else:
-            move = self.abPruing(self.icon,self.gameState,self.gameState.getSize(),2,self.timer)
+            move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer)
             
         return move
 	
@@ -60,7 +60,7 @@ class Player:
         return tempState
     
     # minimax algorithm for the moving phase
-    def abPruing(self,icon,state,size,layer,timer,maximizer=True,alpha=float("-inf"), beta=float("inf")):
+    def abPruning(self,icon,state,size,layer,timer,maximizer=True,alpha=float("-inf"), beta=float("inf")):
         
         # at gameover state
         if(state.isGameover()):
@@ -93,7 +93,7 @@ class Player:
                         # switch players
                         icon = WHITE if icon == BLACK else BLACK
                         
-                        score = self.abPruing(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
+                        score = self.abPruning(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
                         if(score > bestScore):
                             bestScore = score
                             bestMove = move
@@ -112,7 +112,7 @@ class Player:
                         
                         icon = WHITE if icon == BLACK else BLACK
                         
-                        score = self.abPruing(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
+                        score = self.abPruning(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
                         if(score < bestScore):
                             bestScore = score
                             bestMove = move
