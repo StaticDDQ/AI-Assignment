@@ -1,4 +1,4 @@
-
+from copy import deepcopy
 # Player Class
 class Player:
     
@@ -15,7 +15,7 @@ class Player:
         # initate empty game state
         self.gameState = Gamestate(8)
         # get all positions for placing phase
-        self.availablePosition = getAllPositions(self.gameState.getBoard(),self.minY)
+        self.availablePosition = self.getAllPositions(self.gameState.getBoard(),self.minY)
     
     def action(self, turns):
         self.timer += 1
@@ -45,10 +45,10 @@ class Player:
     def placeFirst(self):
         return 1
     
-    def nextState(move,size):
-        state = GameState(size)
-        state.movePiece(move[0],move[1])
-        return state
+    def nextState(state,move):
+        tempState = deepcopy(state)
+        tempState.movePiece(move[0],move[1])
+        return tempState
     
     # minimax algorithm for the moving phase
     def Minimax(self,state,size):
@@ -62,7 +62,7 @@ class Player:
         # the score, if score is the highest, return best move
         for move in moves:
             # apply move to a state, returns a copy
-            clone = self.nextState(move,size)
+            clone = self.nextState(state,move)
             # use that copy to determine the score
             score = self.min_play(clone,size)
             if score < bestScore:
@@ -76,7 +76,7 @@ class Player:
         moves = self.availableMoves(state,self.enemyPiecePos)
         best_score = float('inf')
         for move in moves:
-            clone = self.nextState(move,size)
+            clone = self.nextState(state,move)
             score = self.max_play(clone,size)
             if score < best_score:
                 best_score = score
@@ -88,7 +88,7 @@ class Player:
         moves = self.availableMoves(state,self.currPiecePos)
         best_score = float('-inf')
         for move in moves:
-            clone = self.nextState(move,size)
+            clone = self.nextState(state,move)
             score = self.min_play(clone,size)
             if score > best_score:
                 best_score = score
@@ -171,4 +171,10 @@ class Gamestate:
     
     def getWinner(self):
         return self.winner
+    
+    def getBoard(self):
+        return self.board
+
+    def setBoard(newBoard):
+        self.board = newBoard
     
