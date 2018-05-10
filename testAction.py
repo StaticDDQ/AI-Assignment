@@ -165,8 +165,6 @@ class Gamestate:
                 piece = i
         self.winner = piece
         return True
-		
-	def shrinkBoard(self)
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
@@ -208,9 +206,6 @@ class Gamestate:
 	# sums up set of zipped tuples
 	def sumTuples(zipped):
 		return tuple([sum(x) for x in zipped])
-    
-    def getWinner(self):
-        return self.winner
     
 	# add kills from shrinking
 	def updateKills(self):
@@ -289,3 +284,6 @@ class Gamestate:
     
     def getSize(self):
         return self.size
+    
+    def getWinner(self):
+        return self.winner
