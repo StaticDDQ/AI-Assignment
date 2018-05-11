@@ -22,11 +22,11 @@ class Player:
         self.timer += 1
         # during placing phase
         if(turns<24):
-            
+            move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,True)[1]
 
         # during moving phase
         else:
-            move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer)[1]
+            move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,False)[1]
             
         return move
 	
@@ -61,7 +61,7 @@ class Player:
 		return tempState
     
     # minimax algorithm for the moving phase
-    def abPruning(self,icon,state,size,layer,timer,maximizer=True,alpha=float("-inf"), beta=float("inf")):
+    def abPruning(self,icon,state,size,layer,timer,isPlacing,maximizer=True,alpha=float("-inf"), beta=float("inf")):
         
         # at gameover state
         if(state.isGameover()):
@@ -72,7 +72,11 @@ class Player:
         ceiling = beta
         
         # get all moves for current player
-        moves = state.availableMoves()
+        if(isPlacing):
+            self.minY = 0 if icon == WHITE else 2
+            moves = self.getAllPosition(state.getBoard(),self.minY)
+        else:
+            moves = state.availableMoves()
         # shrink board if timer reaches certain value
         if(timer == 128+24):
             size = 6
@@ -90,11 +94,14 @@ class Player:
                     bestMove = moves[0]
                     for move in moves:
                         # create follow-up state
-                        nextState = self.createNextState(state,size,move)
+                        if(isPlacing):
+                            nextState = self.createNextPlacementState(state,size,icon)
+                        else:
+                            nextState = self.createNextState(state,size,move)
                         # switch players
                         icon = WHITE if icon == BLACK else BLACK
                         
-                        score = self.abPruning(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
+                        score = self.abPruning(icon,nextState,size,layer-1,timer+1,isPlacing,not maximizer,floor,ceiling)[0]
                         if(score > bestScore):
                             bestScore = score
                             bestMove = move
@@ -109,11 +116,14 @@ class Player:
                     bestScore = float('inf')
                     bestMove = moves[0]
                     for move in moves:
-                        nextState = self.createNextState(state,size,move)
+                        if(isPlacing):
+                            nextState = self.createNextPlacementState(state,size,icon)
+                        else:
+                            nextState = self.createNextState(state,size,move)
                         
                         icon = WHITE if icon == BLACK else BLACK
                         
-                        score = self.abPruning(icon,nextState,size,layer-1,timer+1,not maximizer,floor,ceiling)[0]
+                        score = self.abPruning(icon,nextState,size,layer-1,timer+1,isPlacing,not maximizer,floor,ceiling)[0]
                         if(score < bestScore):
                             bestScore = score
                             bestMove = move
