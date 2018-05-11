@@ -1,7 +1,8 @@
 from copy import deepcopy
-import numpy
 
 WHITE, BLACK, BLANK, CORNER = 'O', '@', '-', 'X'
+RIGHT, UP, LEFT, DOWN = (1, 0), (0, 1), (-1, 0), (0, -1)
+DIRECTIONS = [RIGHT, UP, LEFT, DOWN]
 
 # Player Class
 class Player:
@@ -55,8 +56,8 @@ class Player:
         # check if the board shrinks
         if(tempState.getSize() != size):
             tempState.declareBoard(size)
+		tempState.updateKills()
         tempState.movePiece(move[0],move[1])
-        ''' update state in case when something gets destroyed'''
         return tempState
     
     # minimax algorithm for the moving phase
@@ -133,9 +134,7 @@ class Player:
 #==============================================================================
   
 # GameState Class
-RIGHT, UP, LEFT, DOWN = (1, 0), (0, 1), (-1, 0), (0, 1)
-DIRECTIONS = [RIGHT, UP, LEFT, DOWN]
-BLANK, CORNER = '-','X' #Initialized at top, might remove if file splitting can read const from player.py
+
 
 class Gamestate:
     
@@ -215,7 +214,7 @@ class Gamestate:
     
     # add kills from shrinking
     def updateKills(self):
-        totalPieces = self.whitePieces+self.blacPieces
+        totalPieces = self.whitePieces+self.blackPieces
         for piece in totalPieces:
             enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
             origin = (int)((8-self.size)/2)
@@ -230,7 +229,7 @@ class Gamestate:
                     if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
                         self.removePiece(piece)
 						
-            # killed by board shrinking
+				# killed by board shrinking
                 else if piece[axis] < origin or piece[axis] > origin+self.size:
                     self.removePiece(piece)
 	
