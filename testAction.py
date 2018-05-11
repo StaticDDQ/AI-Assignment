@@ -19,9 +19,8 @@ class Player:
         self.availablePosition = self.getAllPositions(self.gameState.getBoard(),self.minY)
     
     def action(self, turns):
-        self.timer += 1
         # during placing phase
-        if(self.timer<12):
+        if(self.timer < 12):
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,True)[1]
             self.gameState.addPiece(move,self.icon)
         # during moving phase
@@ -29,6 +28,7 @@ class Player:
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,False)[1]
             self.gameState.movePiece(move[0],move[1])
         self.gameState.updateKills()
+        self.timer += 1
         return move
 	
     def update(self, action):
@@ -177,10 +177,10 @@ class Gamestate:
         
     # removes a piece, if a piece destroys another piece
     def removePiece(self,pos):
-        print(pos)
         pieceIcon = self.board[pos]
         self.board[pos] = BLANK
         self.whitePieces.remove(pos) if(pieceIcon == WHITE) else self.blackPieces.remove(pos)
+        print(self.blackPieces)
         
     # move a piece to a new direction, during moving phase
     def movePiece(self,oldPos,newPos):
