@@ -55,8 +55,9 @@ class Player:
         tempState.updateKills()
         return tempState
 		
-    def createNextPlacementState(self,state, size, tile):
+    def createNextPlacementState(self, state, size, tile):
         tempState = deepcopy(state)
+        print(tile)
         tempState.addPiece(tile, self.icon)
         tempState.updateKills()
         return tempState
@@ -71,7 +72,7 @@ class Player:
         # get all moves for current player
         if(isPlacing):
             self.minY = 0 if icon == WHITE else 2
-            moves = self.getAllPosition(state.getBoard(),self.minY)
+            moves = self.getAllPositions(state.getBoard(),self.minY)
         else:
             moves = state.availableMoves()
         # shrink board if timer reaches certain value
@@ -180,7 +181,7 @@ class Gamestate:
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
-    def addPiece(self,pos, piece):
+    def addPiece(self, pos, piece):
         self.board[pos] = piece
         self.whitePieces.append(pos) if(piece == WHITE) else self.blackPieces.append(pos)
         
