@@ -223,7 +223,7 @@ class Gamestate:
     def updateKills(self):
         totalPieces = self.whitePieces+self.blackPieces
         for piece in totalPieces:
-            enemy = BLACK if self.board[piece[0],piece[1]] == WHITE else WHITE
+            enemy = BLACK if self.board[piece] == WHITE else WHITE
             origin = (int)((8-self.size)/2)
 			
             # checks x-axis, then y-axis
