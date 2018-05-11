@@ -180,7 +180,7 @@ class Gamestate:
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
-    def addPiece(self,pos, piece):
+    def addPiece(self, pos, piece):
         self.board[pos] = piece
         self.whitePieces.append(pos) if(piece == WHITE) else self.blackPieces.append(pos)
         
