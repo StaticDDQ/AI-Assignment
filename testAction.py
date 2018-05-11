@@ -63,9 +63,9 @@ class Player:
 		
 	def createNextPlacementState(state, size, tile):
 		tempState = deepcopy(state)
-		if tile in getAllPositions(self.minY):
-			tempState.addPiece(tile, self.icon)
-			tempState.updateKills()
+		tempState.addPiece(tile, self.icon)
+		tempState.updateKills()
+		return tempState
     
     # minimax algorithm for the moving phase
     def abPruning(self,icon,state,size,layer,timer,maximizer=True,alpha=float("-inf"), beta=float("inf")):
