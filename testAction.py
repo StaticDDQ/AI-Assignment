@@ -64,10 +64,6 @@ class Player:
     # minimax algorithm for the moving phase
     def abPruning(self,icon,state,size,layer,timer,isPlacing,maximizer=True,alpha=float("-inf"), beta=float("inf")):
         
-        # at gameover state
-        if(state.isGameOver()):
-            return state.eval(icon)
-        
         # a-b pruning
         floor = alpha
         ceiling = beta
@@ -140,7 +136,7 @@ class Player:
             bestScore = state.eval(icon)
             bestMove = None
         
-        return bestScore, bestMove
+        return (bestScore, bestMove)
     
 #==============================================================================
   
