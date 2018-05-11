@@ -23,11 +23,12 @@ class Player:
         # during placing phase
         if(turns<24):
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,True)[1]
-
+            self.gameState.addPiece(move,self.icon)
         # during moving phase
         else:
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,False)[1]
-            
+            self.gameState.movePiece(move[0],move[1])
+        self.gameState.updateKills()
         return move
 	
     def update(self, action):
