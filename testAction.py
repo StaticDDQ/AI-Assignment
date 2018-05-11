@@ -81,9 +81,9 @@ class Player:
         # get all moves for current player
         moves = state.availableMoves()
         # shrink board if timer reaches certain value
-        if(timer == 128):
+        if(timer == 128+24):
             size = 6
-        elif (timer == 192):
+        elif (timer == 192+24):
             size = 4
         
         # if there are available moves
@@ -181,21 +181,22 @@ class Gamestate:
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
     def addPiece(self,pos, piece):
-        self.board[pos[0],pos[1]] = piece
+        self.board[pos] = piece
         self.whitePieces.append(pos) if(piece == WHITE) else self.blackPieces.append(pos)
         
     # removes a piece, if a piece destroys another piece
     def removePiece(self,pos):
         pieceIcon = self.board[pos[0],pos[1]]
-        self.board[pos[0],pos[1]] = BLANK
+        self.board[pos] = BLANK
         self.whitePieces.remove(pos) if(piece == WHITE) else self.blackPieces.remove(pos)
         
     # move a piece to a new direction, during moving phase
     def movePiece(self,oldPos,newPos):
         # get the icon of the piece
-        icon = self.board[oldPos[0],oldPos[1]]
-        self.board[newPos[0],newPos[1]] = icon
-        self.board[oldPos[0],oldPos[1]] = BLANK
+        if(oldPos in self.board and self.board[oldPos] != BLANK)
+        icon = self.board[oldPos]
+        self.board[newPos] = icon
+        self.board[oldPos] = BLANK
     
     # get available moves each piece has in moving phase
     def availableMoves(self,icon):
