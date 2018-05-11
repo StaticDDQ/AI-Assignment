@@ -20,10 +20,10 @@ class Player:
     
     def action(self, turns):
         if(self.timer == 128+24):
-            self.board.updateBoardSize(6)
+            self.board.updateGridSize(6)
             self.board.updateKills()
         elif(self.timer == 192+24):
-            self.board.updateBoardSize(4)
+            self.board.updateGridSize(4)
             self.board.updateKills()
         # during placing phase
         if self.timer < 24:
@@ -39,10 +39,10 @@ class Player:
     
     def update(self, action):
         if(self.timer == 128+24):
-            self.board.updateBoardSize(6)
+            self.board.updateGridSize(6)
             self.board.updateKills()
         elif(self.timer == 192+24):
-            self.board.updateBoardSize(4)
+            self.board.updateGridSize(4)
             self.board.updateKills()
         if self.timer < 24:
             enemy = BLACK if self.colour == WHITE else WHITE
@@ -66,7 +66,7 @@ class Player:
         # check if the grid shrinks
         if(tempState.size != size):
             tempState.size = size
-            tempState.updateBoardSize(size)
+            tempState.updateGridSize(size)
             tempState.updateKills()
         tempState.movePiece(move[0], move[1])
         tempState.updateKills()
@@ -164,9 +164,9 @@ class Board:
     
     def __init__(self, size):
         self.size = size
-        self.grid = self.declareBoard(size)
+        self.grid = self.gridInit(size)
         
-    def declareBoard(self, size):
+    def gridInit(self, size):
         grid = {}
         calc = (int)((8-size)/2) # in case grid has shrunk
         for row in range(calc,size+calc):
@@ -181,7 +181,7 @@ class Board:
         
         return grid
     
-    def updateBoardSize(self, size):
+    def updateGridSize(self, size):
         self.size = size
         origin = (int)((8-size)/2)
         deletion = []
@@ -208,7 +208,7 @@ class Board:
             self.grid[newPos] = colour
             self.grid[oldPos] = BLANK
     
-    def getPieces(self, colour="Both"):
+    def getPieces(self, colour = "Both"):
         pieces = []
         origin = (int)((8-self.size)/2) # in case grid has shrunk
         for col in range(origin, origin+self.size):
