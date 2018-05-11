@@ -20,7 +20,7 @@ class Player:
     
     def action(self, turns):
         # during placing phase
-        if(self.timer < 12):
+        if self.timer < 24:
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,True)[1]
             self.gameState.addPiece(move,self.icon)
         # during moving phase
@@ -29,15 +29,18 @@ class Player:
             self.gameState.movePiece(move[0],move[1])
         self.gameState.updateKills()
         self.timer += 1
+        #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.blackPieces))
         return move
 	
     def update(self, action):
-        if self.timer < 12:
+        if self.timer < 24:
             enemy = BLACK if self.icon == WHITE else WHITE
             self.gameState.addPiece(action, enemy)
         else:
             self.gameState.movePiece(action[0], action[1])
         self.gameState.updateKills()
+        self.timer += 1
+        #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.blackPieces))
     
     def getAllPositions(self,board,minY):
         availablePosition = []
@@ -79,9 +82,9 @@ class Player:
         else:
             moves = state.availableMoves(icon)
         # shrink board if timer reaches certain value
-        if(timer == 64+12):
+        if(timer == 128+24):
             size = 6
-        elif (timer == 96+12):
+        elif (timer == 192+24):
             size = 4
         
         # if there are available moves
@@ -180,7 +183,6 @@ class Gamestate:
         pieceIcon = self.board[pos]
         self.board[pos] = BLANK
         self.whitePieces.remove(pos) if(pieceIcon == WHITE) else self.blackPieces.remove(pos)
-        print(self.blackPieces)
         
     # move a piece to a new direction, during moving phase
     def movePiece(self,oldPos,newPos):
