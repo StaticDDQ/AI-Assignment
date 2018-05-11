@@ -15,6 +15,8 @@ class Player:
         self.icon = WHITE if colour == 'white' else BLACK
         # initate empty game state
         self.gameState = Gamestate(8)
+        print(self.gameState.getBoard())
+        print(self.minY)
         # get all positions for placing phase
         self.availablePosition = self.getAllPositions(self.gameState.getBoard(),self.minY)
     
@@ -39,7 +41,7 @@ class Player:
         availablePosition = []
         # find all positions for player to place a piece during placing phase
         for pos in board:
-            if(pos[1] >= minY and board[pos] == BLANK):
+            if(minY <= pos[1] <= minY+5 and board[pos] == BLANK):
                 availablePosition.append(pos)
         return availablePosition
     
@@ -162,8 +164,8 @@ class Gamestate:
         for row in range(calc,size+calc):
             for col in range(calc,size+calc):
                 if((row == size+calc-1 and col == size+calc-1) or 
-                   (row == size+calc-1 and col == size+calc-1) or
-                   (row == calc and col == size-1) or 
+                   (row == size+calc-1 and col == calc) or
+                   (row == calc and col == size+calc-1) or 
                    (row == calc and col == calc)):
                     board[col,row] = CORNER
                 else:
