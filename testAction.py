@@ -27,9 +27,10 @@ class Player:
         else:
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,False)[1]
             self.gameState.movePiece(move[0],move[1])
-        self.gameState.updateKills()
         self.timer += 1
-        #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.blackPieces))
+        print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.whitePieces))
+        self.gameState.updateKills()
+        print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.whitePieces))
         return move
 	
     def update(self, action):
@@ -38,8 +39,8 @@ class Player:
             self.gameState.addPiece(action, enemy)
         else:
             self.gameState.movePiece(action[0], action[1])
-        self.gameState.updateKills()
         self.timer += 1
+
         if(self.timer >= 128 + 24):
             self.gameState.size = 6
             self.gameState.updatePiece(self.gameState.size)
@@ -177,23 +178,6 @@ class Gamestate:
                 else:
                     board[col,row] = BLANK
         
-        if(len(self.whitePieces)>0):
-            wPieces = []
-            for piece in self.whitePieces:
-                if(piece[0] < calc or piece[1] < calc or 
-                   piece[0] > size+calc-1 or piece[1] > size+calc-1):
-                    wPieces.append(piece)
-            for piece in wPieces:
-                self.whitePieces.remove(piece)
-        if(len(self.blackPieces)>0):
-            bPieces = []
-            for piece in self.blackPieces:
-                if(piece[0] < calc or piece[1] < calc or 
-                   piece[0] > size+calc-1 or piece[1] > size+calc-1):
-                    bPieces.append(piece)
-            for piece in bPieces:
-                self.blackPieces.remove(piece)
-            
         return board
     
     def updatePiece(self,size):
@@ -263,10 +247,17 @@ class Gamestate:
                     negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))]
                     if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
                         self.removePiece(piece)
+                        break
 						
 				# killed by board shrinking
                 elif (piece[axis] < origin or piece[axis] > origin+self.size-1):
+                    print(piece)
                     self.removePiece(piece)
+                    break
+                elif (piece[(axis+1)%2] == origin or piece[(axis+1)%2] == origin+self.size-1):
+                    print(piece)
+                    self.removePiece(piece)
+                    break
 	
     # returns score for minimax evaluation of board state
     def eval(self, colour):
