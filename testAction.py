@@ -55,9 +55,9 @@ class Player:
         tempState.updateKills()
         return tempState
 		
-    def createNextPlacementState(self,state, size, tile):
+    def createNextPlacementState(self,state, pos, tile):
         tempState = deepcopy(state)
-        tempState.addPiece(tile, self.icon)
+        tempState.addPiece(pos, tile)
         tempState.updateKills()
         return tempState
     
@@ -71,7 +71,7 @@ class Player:
         # get all moves for current player
         if(isPlacing):
             self.minY = 0 if icon == WHITE else 2
-            moves = self.getAllPosition(state.getBoard(),self.minY)
+            moves = self.getAllPositions(state.getBoard(),self.minY)
         else:
             moves = state.availableMoves()
         # shrink board if timer reaches certain value
@@ -92,7 +92,7 @@ class Player:
                     for move in moves:
                         # create follow-up state
                         if(isPlacing):
-                            nextState = self.createNextPlacementState(state,size,icon)
+                            nextState = self.createNextPlacementState(state,move,icon)
                         else:
                             nextState = self.createNextState(state,size,move)
                         # switch players
@@ -114,7 +114,7 @@ class Player:
                     bestMove = moves[0]
                     for move in moves:
                         if(isPlacing):
-                            nextState = self.createNextPlacementState(state,size,icon)
+                            nextState = self.createNextPlacementState(state,move,icon)
                         else:
                             nextState = self.createNextState(state,size,move)
                         
