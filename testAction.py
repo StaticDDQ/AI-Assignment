@@ -40,6 +40,12 @@ class Player:
             self.gameState.movePiece(action[0], action[1])
         self.gameState.updateKills()
         self.timer += 1
+        if(self.timer >= 128 + 24):
+            self.gameState.size = 6
+            self.gameState.updatePiece(self.gameState.size)
+        elif(self.timer >= 192+24):
+            self.gameState.size = 4
+            self.gameState.updatePiece(self.gameState.size)
         #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.blackPieces))
     
     def getAllPositions(self,board,minY):
@@ -190,6 +196,13 @@ class Gamestate:
             
         return board
     
+    def updatePiece(self,size):
+        if(size == 6):
+            self.whitePieces = [x for x in self.whitePieces if((x[0]>=1 or x[0]<=6) and (x[1]>=1 or x[1]<=6))]
+            self.blackPieces = [x for x in self.blackPieces if((x[0]>=1 or x[0]<=6) and (x[1]>=1 or x[1]<=6))]
+        elif(size == 4):
+            self.whitePieces = [x for x in self.whitePieces if((x[0]>=2 or x[0]<=5) and (x[1]>=2 or x[1]<=5))]
+            self.blackPieces = [x for x in self.blackPieces if((x[0]>=2 or x[0]<=5) and (x[1]>=2 or x[1]<=5))]
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
     def addPiece(self, pos, piece):
