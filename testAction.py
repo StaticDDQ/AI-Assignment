@@ -50,16 +50,16 @@ class Player:
         # check if the board shrinks
         if(tempState.getSize() != size):
             tempState.declareBoard(size)
-		tempState.updateKills()
+            tempState.updateKills()
         tempState.movePiece(move[0],move[1])
-		tempState.updateKills()
+        tempState.updateKills()
         return tempState
 		
-	def createNextPlacementState(state, size, tile):
-		tempState = deepcopy(state)
-		tempState.addPiece(tile, self.icon)
-		tempState.updateKills()
-		return tempState
+    def createNextPlacementState(state, size, tile):
+        tempState = deepcopy(state)
+        tempState.addPiece(tile, self.icon)
+        tempState.updateKills()
+        return tempState
     
     # minimax algorithm for the moving phase
     def abPruning(self,icon,state,size,layer,timer,isPlacing,maximizer=True,alpha=float("-inf"), beta=float("inf")):
@@ -197,10 +197,10 @@ class Gamestate:
     # move a piece to a new direction, during moving phase
     def movePiece(self,oldPos,newPos):
         # get the icon of the piece
-        if(oldPos in self.board and self.board[oldPos] != BLANK)
-        icon = self.board[oldPos]
-        self.board[newPos] = icon
-        self.board[oldPos] = BLANK
+        if(oldPos in self.board and self.board[oldPos] != BLANK):
+            icon = self.board[oldPos]
+            self.board[newPos] = icon
+            self.board[oldPos] = BLANK
     
     # get available moves each piece has in moving phase
     def availableMoves(self,icon):
