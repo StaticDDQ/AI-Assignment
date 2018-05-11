@@ -234,20 +234,6 @@ class Gamestate:
                 else if piece[axis] < origin or piece[axis] > origin+self.size:
                     self.removePiece(piece)
 	
-    # return array of all pieces of specified colour existing on board
-    def getPieces(self, colour="Both"):
-        pieces = []
-        origin = (int)((8-self.size)/2) # in case board has shrunk
-        for row in range(origin, origin+self.size):
-            for col in range(origin, origin+self.size):
-                if colour == "Both":
-                    if(self.board[row, col] == WHITE or self.board[row, col] == BLACK):
-                        pieces.append((col, row))
-                else:
-                    if(self.board[row, col] == colour):
-                        pieces.append((col, row))
-        return pieces
-	
     # returns score for minimax evaluation of board state
     def eval(self, colour):
         enemy = BLACK if colour == WHITE else WHITE
