@@ -36,7 +36,7 @@ def main():
     print(game)
 
     while game.playing():
-        #print("Turn start")
+        print("Turn start")
         if options.delay:
             time.sleep(options.delay)
         turns = game.turns
@@ -68,7 +68,7 @@ def main():
         
         # other player's turn!
         player, opponent = opponent, player
-        #print("Turn end")
+        print("Turn end")
 
     print(f'winner: {game.winner}!')
 
