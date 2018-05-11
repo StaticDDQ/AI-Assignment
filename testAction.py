@@ -21,7 +21,7 @@ class Player:
     def action(self, turns):
         self.timer += 1
         # during placing phase
-        if(turns<24):
+        if(self.timer<12):
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,True)[1]
             self.gameState.addPiece(move,self.icon)
         # during moving phase
@@ -32,7 +32,11 @@ class Player:
         return move
 	
     def update(self, action):
-        self.gameState.movePiece(action[0], action[1])
+        if self.timer < 12:
+            enemy = BLACK if self.icon == WHITE else WHITE
+            self.gameState.addPiece(action, enemy)
+        else:
+            self.gameState.movePiece(action[0], action[1])
         self.gameState.updateKills()
     
     def getAllPositions(self,board,minY):
@@ -73,11 +77,11 @@ class Player:
             self.minY = 0 if icon == WHITE else 2
             moves = self.getAllPositions(state.getBoard(),self.minY)
         else:
-            moves = state.availableMoves()
+            moves = state.availableMoves(icon)
         # shrink board if timer reaches certain value
-        if(timer == 128+24):
+        if(timer == 64+12):
             size = 6
-        elif (timer == 192+24):
+        elif (timer == 96+12):
             size = 4
         
         # if there are available moves
@@ -148,7 +152,6 @@ class Gamestate:
     def __init__(self,size):
         self.board = self.declareBoard(size)
         self.size = size
-        self.winner = ''
         self.whitePieces = []
         self.blackPieces = []
         
@@ -165,18 +168,6 @@ class Gamestate:
                 else:
                     board[col,row] = BLANK
         return board
-    # check if the game has ended
-    def isGameOver(self):
-        piece = ''
-        for i in self.board:
-            # if there is another piece thats different, 
-            # then game is not over
-            if(i==WHITE or i==BLACK):
-                if(piece != i):
-                    return False
-                piece = i
-        self.winner = piece
-        return True
     
     # assumes that pos is valid, position is within bound and piece is correct
     # adds a piece, during placing phase
@@ -186,7 +177,8 @@ class Gamestate:
         
     # removes a piece, if a piece destroys another piece
     def removePiece(self,pos):
-        pieceIcon = self.board[pos[0],pos[1]]
+        print(pos)
+        pieceIcon = self.board[pos]
         self.board[pos] = BLANK
         self.whitePieces.remove(pos) if(pieceIcon == WHITE) else self.blackPieces.remove(pos)
         
@@ -238,7 +230,7 @@ class Gamestate:
                         self.removePiece(piece)
 						
 				# killed by board shrinking
-                elif (piece[axis] < origin or piece[axis] > origin+self.size):
+                elif (piece[axis] < origin or piece[axis] > origin+self.size-1):
                     self.removePiece(piece)
 	
     # returns score for minimax evaluation of board state
@@ -286,9 +278,6 @@ class Gamestate:
     
     def getSize(self):
         return self.size
-    
-    def getWinner(self):
-        return self.winner
     
     def getBoard(self):
         return self.board
