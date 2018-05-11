@@ -82,9 +82,9 @@ class Player:
         else:
             moves = state.availableMoves(icon)
         # shrink board if timer reaches certain value
-        if(timer == 128+24):
+        if(timer >= 128+24):
             size = 6
-        elif (timer == 192+24):
+        if(timer >= 192+24):
             size = 4
         
         # if there are available moves
