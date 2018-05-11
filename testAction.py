@@ -20,11 +20,8 @@ class Player:
     
     def action(self, turns):
         self.timer += 1
-        # first turn for player
-        if(turns == 0):
-            return self.placeFirst()
         # during placing phase
-        elif(0<turns<24):
+        if(turns<24):
             
 
         # during moving phase
@@ -44,10 +41,6 @@ class Player:
             if(pos[1] >= minY and board[pos] == BLANK):
                 availablePosition.append(pos)
         return availablePosition
-    
-    # method in cases where player moves first, called once
-    def placeFirst(self):
-        return 1
     
     # make a copy of the next state when it makes a move
     def createNextState(state,size,move):
