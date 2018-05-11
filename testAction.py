@@ -28,7 +28,7 @@ class Player:
 
         # during moving phase
         else:
-            move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer)
+            move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer)[1]
             
         return move
 	
