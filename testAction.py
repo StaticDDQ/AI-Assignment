@@ -153,10 +153,10 @@ class Player:
 class Gamestate:
     
     def __init__(self,size):
-        self.board = self.declareBoard(size)
         self.size = size
         self.whitePieces = []
         self.blackPieces = []
+        self.board = self.declareBoard(size)
         
     def declareBoard(self,size):
         board = {}
