@@ -241,11 +241,12 @@ class Gamestate:
         enemyPieces = self.whitePieces if enemy == WHITE else self.blackPieces
         score = 0;
 		
-        # Score = Enemy Vulnerability - Player Vulnerability
+        # Score = Player Defense - Enemy Defense
+		# Defense = 5 - Vulnerability (5 = Max Vulnerability) (negative correlation)
         for piece in playerPieces:
-            score -= self.calcVulnerability(piece, colour, enemy)
+            score += 5 - self.calcVulnerability(piece, colour, enemy)
         for piece in enemyPieces:
-            score += self.calcVulnerability(piece, enemy, colour)
+            score -= 5 - self.calcVulnerability(piece, enemy, colour)
 			
         return score
 	
@@ -273,7 +274,7 @@ class Gamestate:
 				
         vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount != 0 else 0
         # Level of vulnerability has 3 times higher priority than number of vulnerable axes
-        vulnerableWeighted = 0.25*vulnerableSum + 0.75*vulnerableAvg
+        vulnerableWeighted = vulnerableSum + 3*vulnerableAvg
         return vulnerableWeighted
     
     def getSize(self):
