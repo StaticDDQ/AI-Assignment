@@ -15,8 +15,6 @@ class Player:
         self.icon = WHITE if colour == 'white' else BLACK
         # initate empty game state
         self.gameState = Gamestate(8)
-        print(self.gameState.getBoard())
-        print(self.minY)
         # get all positions for placing phase
         self.availablePosition = self.getAllPositions(self.gameState.getBoard(),self.minY)
     
@@ -37,7 +35,7 @@ class Player:
         self.gameState.movePiece(action[0], action[1])
         self.gameState.updateKills()
     
-    def getAllPositions(board,minY):
+    def getAllPositions(self,board,minY):
         availablePosition = []
         # find all positions for player to place a piece during placing phase
         for pos in board:
@@ -46,7 +44,7 @@ class Player:
         return availablePosition
     
     # make a copy of the next state when it makes a move
-    def createNextState(state,size,move):
+    def createNextState(self,state,size,move):
         # copy current state
         tempState = deepcopy(state)
         # check if the board shrinks
@@ -67,7 +65,7 @@ class Player:
     def abPruning(self,icon,state,size,layer,timer,isPlacing,maximizer=True,alpha=float("-inf"), beta=float("inf")):
         
         # at gameover state
-        if(state.isGameover()):
+        if(state.isGameOver()):
             return state.eval(icon)
         
         # a-b pruning
@@ -223,7 +221,7 @@ class Gamestate:
         return moves
 	
     # sums up set of zipped tuples
-    def sumTuples(zipped):
+    def sumTuples(self,zipped):
         return tuple([sum(x) for x in zipped])
     
     # add kills from shrinking
