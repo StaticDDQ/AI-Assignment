@@ -189,6 +189,8 @@ class Gamestate:
             icon = self.board[oldPos]
             self.board[newPos] = icon
             self.board[oldPos] = BLANK
+            self.whitePieces.remove(oldPos) if icon == WHITE else self.blackPieces.remove(oldPos)
+            self.whitePieces.append(newPos) if icon == WHITE else self.blackPieces.append(newPos)
     
     # get available moves each piece has in moving phase
     def availableMoves(self,icon):
