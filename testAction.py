@@ -170,22 +170,23 @@ class Gamestate:
                     board[col,row] = CORNER
                 else:
                     board[col,row] = BLANK
-               
-        wPieces = []
-        bPieces = []
-        for piece in self.whitePieces:
-            if(piece[0] < calc or piece[1] < calc or 
-               piece[0] > size+calc-1 or piece[1] > size+calc-1):
-                wPieces.append(piece)
-        for piece in self.blackPieces:
-            if(piece[0] < calc or piece[1] < calc or 
-               piece[0] > size+calc-1 or piece[1] > size+calc-1):
-                bPieces.append(piece)
         
-        for piece in wPieces:
-            self.whitePieces.remove(piece)
-        for piece in bPieces:
-            self.blackPieces.remove(piece)
+        if(len(self.whitePieces)>0):
+            wPieces = []
+            for piece in self.whitePieces:
+                if(piece[0] < calc or piece[1] < calc or 
+                   piece[0] > size+calc-1 or piece[1] > size+calc-1):
+                    wPieces.append(piece)
+            for piece in wPieces:
+                self.whitePieces.remove(piece)
+        if(len(self.blackPieces)>0):
+            bPieces = []
+            for piece in self.blackPieces:
+                if(piece[0] < calc or piece[1] < calc or 
+                   piece[0] > size+calc-1 or piece[1] > size+calc-1):
+                    bPieces.append(piece)
+            for piece in bPieces:
+                self.blackPieces.remove(piece)
             
         return board
     
