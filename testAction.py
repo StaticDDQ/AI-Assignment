@@ -293,3 +293,6 @@ class Gamestate:
     
     def getWinner(self):
         return self.winner
+    
+    def getBoard(self):
+        return self.board
