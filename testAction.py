@@ -231,7 +231,7 @@ class Gamestate:
             for axis in range(0,2):
 			
 				# killed by surrounding enemies
-                if origin < piece[axis] < origin+self.size:
+                if origin < piece[axis] < origin+self.size-1:
                     posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))]
                     negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))]
                     if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
@@ -266,7 +266,7 @@ class Gamestate:
         for axis in range(0,2):
 		
             # piece is safe in that axis is sticking to the edge
-            if origin < piece[axis] < origin+self.size:
+            if origin < piece[axis] < origin+self.size-1:
 			
                 # tiles beside piece
                 posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))]
