@@ -151,13 +151,13 @@ class Gamestate:
     
     def __init__(self,size):
         self.board = self.declareBoard(size)
+        self.size = size
         self.winner = ''
         self.whitePieces = []
         self.blackPieces = []
         
     def declareBoard(self,size):
-        self.board = {}
-        self.size = size
+        board = {}
         calc = (int)((8-size)/2) # in case board has shrunk
         for row in range(calc,size+calc):
             for col in range(calc,size+calc):
@@ -165,10 +165,10 @@ class Gamestate:
                    (row == size+calc-1 and col == size+calc-1) or
                    (row == calc and col == size-1) or 
                    (row == calc and col == calc)):
-                    self.board[col,row] = CORNER
+                    board[col,row] = CORNER
                 else:
-                    self.board[col,row] = BLANK
-    
+                    board[col,row] = BLANK
+        return board
     # check if the game has ended
     def isGameOver(self):
         piece = ''
