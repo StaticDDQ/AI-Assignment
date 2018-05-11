@@ -19,9 +19,11 @@ class Player:
         self.availablePosition = self.getAllPositions(self.board.grid, self.minY)
     
     def action(self, turns):
+        # shrink to size of 6 when it reaches move 128
         if(self.timer == 128+24):
             self.board.updateGridSize(6)
             self.board.updateKills()
+        # shrink to size of 4 when it reaches move 192
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
             self.board.updateKills()
@@ -38,19 +40,23 @@ class Player:
         return move
     
     def update(self, action):
+        # update board size if it shrinks
         if(self.timer == 128+24):
             self.board.updateGridSize(6)
             self.board.updateKills()
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
             self.board.updateKills()
+        # during placing phase
         if self.timer < 24:
             enemy = BLACK if self.colour == WHITE else WHITE
             self.board.addPiece(action, enemy)
+        # during moving phase
         else:
             self.board.movePiece(action[0], action[1])
         self.timer += 1
     
+    # get all possible positions within appropriate range, for placing phase
     def getAllPositions(self, grid, minY):
         availablePosition = []
         # find all positions for player to place a piece during placing phase
@@ -68,11 +74,14 @@ class Player:
             tempState.size = size
             tempState.updateGridSize(size)
             tempState.updateKills()
+        # move piece to appropriate location
         tempState.movePiece(move[0], move[1])
         tempState.updateKills()
         return tempState
         
+    # make a next state during placing phase
     def createNextPlacementState(self, state, pos, tile):
+        # copy current state and add a piece
         tempState = deepcopy(state)
         tempState.addPiece(pos, tile)
         tempState.updateKills()
@@ -197,7 +206,6 @@ class Board:
         
     # removes a piece, if a piece destroys another piece
     def removePiece(self, pos):
-        pieceIcon = self.grid[pos]
         self.grid[pos] = BLANK
         
     # move a piece to a new direction, during moving phase
@@ -208,11 +216,13 @@ class Board:
             self.grid[newPos] = colour
             self.grid[oldPos] = BLANK
     
+    # return list of all pieces's position, can search both, white, or black
     def getPieces(self, colour = "Both"):
         pieces = []
         origin = (int)((8-self.size)/2) # in case grid has shrunk
         for col in range(origin, origin+self.size):
             for row in range(origin, origin+self.size):
+                # if want to search both black and white pieces
                 if colour == "Both":
                     if self.grid[col, row] == WHITE or self.grid[col, row] == BLACK:
                         pieces.append((col, row))
@@ -251,7 +261,6 @@ class Board:
             
             # checks x-axis, then y-axis
             for axis in range(0,2):
-            
                 # killed by surrounding enemies
                 if origin < piece[axis] < origin+self.size-1:
                     posAxis = self.grid[self.sumTuples(zip(piece, DIRECTIONS[axis]))]
@@ -262,11 +271,9 @@ class Board:
                         
                 # killed by grid shrinking
                 elif (piece[axis] < origin or piece[axis] > origin+self.size-1):
-                    #print(piece)
                     self.removePiece(piece)
                     break
                 elif (piece[(axis+1)%2] == origin or piece[(axis+1)%2] == origin+self.size-1):
-                    #print(piece)
                     self.removePiece(piece)
                     break
     
