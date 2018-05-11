@@ -55,7 +55,7 @@ class Player:
         tempState.updateKills()
         return tempState
 		
-    def createNextPlacementState(state, size, tile):
+    def createNextPlacementState(self,state, size, tile):
         tempState = deepcopy(state)
         tempState.addPiece(tile, self.icon)
         tempState.updateKills()
@@ -192,7 +192,7 @@ class Gamestate:
     def removePiece(self,pos):
         pieceIcon = self.board[pos[0],pos[1]]
         self.board[pos] = BLANK
-        self.whitePieces.remove(pos) if(piece == WHITE) else self.blackPieces.remove(pos)
+        self.whitePieces.remove(pos) if(pieceIcon == WHITE) else self.blackPieces.remove(pos)
         
     # move a piece to a new direction, during moving phase
     def movePiece(self,oldPos,newPos):
@@ -236,13 +236,13 @@ class Gamestate:
 			
 				# killed by surrounding enemies
                 if origin < piece[axis] < origin+self.size:
-                    posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
-                    negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
+                    posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))]
+                    negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))]
                     if (posAxis == CORNER or posAxis == enemy) and (negAxis == CORNER or negAxis == enemy):
                         self.removePiece(piece)
 						
 				# killed by board shrinking
-                else if piece[axis] < origin or piece[axis] > origin+self.size:
+                elif (piece[axis] < origin or piece[axis] > origin+self.size):
                     self.removePiece(piece)
 	
     # returns score for minimax evaluation of board state
@@ -273,11 +273,11 @@ class Gamestate:
             if origin < piece[axis] < origin+self.size:
 			
                 # tiles beside piece
-                posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))
-                negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))
+                posAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis]))]
+                negAxis = self.board[self.sumTuples(zip(piece, DIRECTIONS[axis+2]))]
 				
                 # piece is safe in that axis if at least one friendly piece beside, can't be surrounded
-                if !(posAxis == colour or negAxis == colour):
+                if not (posAxis == colour or negAxis == colour):
                     vulnerableCount += 1
                     # Vulnerability = # of enemy pieces surrounding piece * 0.5
                     # Eg: 0 = no pieces, 0.5 = 1 enemy piece, 1 = killed
