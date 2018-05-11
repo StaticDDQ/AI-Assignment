@@ -28,9 +28,9 @@ class Player:
             move = self.abPruning(self.icon,self.gameState,self.gameState.getSize(),2,self.timer,False)[1]
             self.gameState.movePiece(move[0],move[1])
         self.timer += 1
-        print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.whitePieces))
+        #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.whitePieces))
         self.gameState.updateKills()
-        print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.whitePieces))
+        #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.whitePieces))
         return move
 	
     def update(self, action):
@@ -41,13 +41,16 @@ class Player:
             self.gameState.movePiece(action[0], action[1])
         self.timer += 1
 
-        if(self.timer >= 128 + 24):
+        if(self.timer == 128+24):
             self.gameState.size = 6
+            self.gameState.updateBoardSize(6)
             self.gameState.updatePiece(self.gameState.size)
-        elif(self.timer >= 192+24):
+        elif(self.timer == 192+24):
             self.gameState.size = 4
+            self.gameState.updateBoardSize(4)
             self.gameState.updatePiece(self.gameState.size)
         #print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.blackPieces))
+		#print(self.icon + "'s perspective at time " + str(self.timer) + str(self.gameState.blackPieces))
     
     def getAllPositions(self,board,minY):
         availablePosition = []
@@ -63,7 +66,7 @@ class Player:
         tempState = deepcopy(state)
         # check if the board shrinks
         if(tempState.getSize() != size):
-            tempState.declareBoard(size)
+            tempState.updateBoardSize(size)
             tempState.updateKills()
         tempState.movePiece(move[0],move[1])
         tempState.updateKills()
@@ -179,6 +182,15 @@ class Gamestate:
                     board[col,row] = BLANK
         
         return board
+	
+    def updateBoardSize(self, size):
+        origin = (int)((8-size)/2)
+        deletion = []
+        for tile in self.board:
+            if tile[0] < origin or tile[0] > origin+size-1 or tile[1] < origin or tile[1] > origin+size-1:
+                deletion.append(tile)
+        for tile in deletion:
+            self.board.pop(tile)
     
     def updatePiece(self,size):
         if(size == 6):
@@ -251,11 +263,11 @@ class Gamestate:
 						
 				# killed by board shrinking
                 elif (piece[axis] < origin or piece[axis] > origin+self.size-1):
-                    print(piece)
+                    #print(piece)
                     self.removePiece(piece)
                     break
                 elif (piece[(axis+1)%2] == origin or piece[(axis+1)%2] == origin+self.size-1):
-                    print(piece)
+                    #print(piece)
                     self.removePiece(piece)
                     break
 	
