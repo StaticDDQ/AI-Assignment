@@ -40,13 +40,6 @@ class Player:
         return move
     
     def update(self, action):
-        # update board size if it shrinks
-        if(self.timer == 128+24):
-            self.board.updateGridSize(6)
-            self.board.updateKills()
-        elif(self.timer == 192+24):
-            self.board.updateGridSize(4)
-            self.board.updateKills()
         # during placing phase
         if self.timer < 24:
             enemy = BLACK if self.colour == WHITE else WHITE
@@ -55,6 +48,13 @@ class Player:
         else:
             self.board.movePiece(action[0], action[1])
         self.timer += 1
+		# update board size if it shrinks
+        if(self.timer == 128+24):
+            self.board.updateGridSize(6)
+            self.board.updateKills()
+        elif(self.timer == 192+24):
+            self.board.updateGridSize(4)
+            self.board.updateKills()
     
     # get all possible positions within appropriate range, for placing phase
     def getAllPositions(self, grid, minY):
