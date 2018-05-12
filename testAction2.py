@@ -22,16 +22,17 @@ class Player:
         # shrink to size of 6 when it reaches move 128
         if(self.timer == 128+24):
             self.board.updateGridSize(6)
+            #print("Shrinking for " + self.colour + " in action()")
         # shrink to size of 4 when it reaches move 192
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
         # during placing phase
         if self.timer < 24:
-            move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, True)[1]
+            move = self.abPruning(self.colour, self.board, self.board.size, 1, self.timer, True)[1]
             self.board.addPiece(move, self.colour)
         # during moving phase
         else:
-            move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, False)[1]
+            move = self.abPruning(self.colour, self.board, self.board.size, 1, self.timer, False)[1]
             self.board.movePiece(move[0], move[1])
         self.timer += 1
         self.board.updateKills()
@@ -45,13 +46,15 @@ class Player:
         # during moving phase
         else:
             self.board.movePiece(action[0], action[1])
-        self.timer += 1
 		# update board size if it shrinks
         if(self.timer == 128+24):
             self.board.updateGridSize(6)
+            #print("Shrinking for " + self.colour + " in update()")
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
+        self.timer += 1
         self.board.updateKills()
+        #print(self.board.getPieces(BLACK))
     
     # get all possible positions within appropriate range, for placing phase
     def getAllPositions(self, grid, minY):
@@ -72,7 +75,6 @@ class Player:
         tempState.updateKills()
         if(tempState.size != size):
             tempState.updateGridSize(size)
-            print(tempState.grid)
             tempState.updateKills()
         return tempState
         
