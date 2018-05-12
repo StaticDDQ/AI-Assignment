@@ -67,13 +67,13 @@ class Player:
         # copy current state
         tempState = deepcopy(state)
         # check if the grid shrinks
-        if(tempState.size != size):
-            tempState.size = size
-            tempState.updateGridSize(size)
-            tempState.updateKills()
         # move piece to appropriate location
         tempState.movePiece(move[0], move[1])
         tempState.updateKills()
+        if(tempState.size != size):
+            tempState.updateGridSize(size)
+            print(tempState.grid)
+            tempState.updateKills()
         return tempState
         
     # make a next state during placing phase
@@ -192,10 +192,14 @@ class Board:
         origin = (int)((8-size)/2)
         deletion = []
         for tile in self.grid:
-            if tile[0] < origin or tile[0] > origin+size-1 or tile[1] < origin or tile[1] > origin+size-1:
+            if (tile == (origin,origin+size-1) or tile == (origin+size-1,origin) or 
+                tile == (origin+size-1,origin+size-1) or tile == (origin,origin)):
+                self.grid[tile] = CORNER
+            elif not(origin+size-1 >= tile[0] >= origin and origin+size-1 >= tile[1] >= origin):
                 deletion.append(tile)
         for tile in deletion:
             self.grid.pop(tile)
+
     
     # adds a piece, during placing phase
     def addPiece(self, pos, piece):
