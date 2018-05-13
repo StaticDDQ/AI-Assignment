@@ -26,11 +26,13 @@ class Player:
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
         if self.timer < 24:
-            move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, True)[1]
+            move = self.minimax(self.colour, self.board, self.board.size, 2, self.timer, True)[1]
             self.board.addPiece(move, self.colour)
         # during moving phase
         else:
-            move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, False)[1]
+            move = self.minimax(self.colour, self.board, self.board.size, 2, self.timer, False)[1]
+            print(self.board.availableMoves(self.colour))
+            print(move)
             self.board.movePiece(move[0], move[1])
         self.timer += 1
         self.board.updateKills(self.enemy)
@@ -88,7 +90,7 @@ class Player:
         return tempState
     
     # minimax algorithm for the moving phase
-    def abPruning(self, colour, state, size, layer, timer, isPlacing ,maximizer=True, alpha=float("-inf"), beta=float("inf")):
+    def minimax(self, colour, state, size, layer, timer, isPlacing ,maximizer=True, alpha=float("-inf"), beta=float("inf")):
         
         # a-b pruning
         floor = alpha
@@ -124,7 +126,7 @@ class Player:
                         # switch players
                         colour = WHITE if colour == BLACK else BLACK
                         
-                        score = self.abPruning(colour, nextState, size, layer-1, timer+1, isPlacing, not maximizer, floor, ceiling)[0]
+                        score = self.minimax(colour, nextState, size, layer-1, timer+1, isPlacing, not maximizer, floor, ceiling)[0]
                         if(score > bestScore):
                             bestScore = score
                             bestMove = move
@@ -146,7 +148,7 @@ class Player:
                         
                         colour = WHITE if colour == BLACK else BLACK
                         
-                        score = self.abPruning(colour, nextState, size, layer-1, timer+1, isPlacing, not maximizer, floor, ceiling)[0]
+                        score = self.minimax(colour, nextState, size, layer-1, timer+1, isPlacing, not maximizer, floor, ceiling)[0]
                         if(score < bestScore):
                             bestScore = score
                             bestMove = move
@@ -156,10 +158,10 @@ class Player:
                         if(bestScore <= floor): # Stop searching any more if it's below the lower limit
                             break
             else:
-                bestScore = state.eval(colour)
+                bestScore = state.eval(self.colour, timer)
                 bestMove = None
         else:
-            bestScore = state.eval(colour)
+            bestScore = state.eval(self.colour, timer)
             bestMove = None
         
         return (bestScore, bestMove)
@@ -236,20 +238,21 @@ class Board:
     
     # get available moves each piece has in moving phase
     def availableMoves(self, colour):
-        currPos = self.getPieces(colour)
+        pieces = self.getPieces(colour)
         moves = []
-        for piece in currPos:
+        for piece in pieces:
             for direction in DIRECTIONS:
                 # a normal move to an adjacent square
                 adjacent_square = self.sumTuples(zip(piece, direction))
-                if(adjacent_square in self.grid and self.grid[adjacent_square] == BLANK):
-                    moves.append((piece,adjacent_square))
-                    continue # a jump move is not possible in this direction
+                opposite_square = self.sumTuples(zip(piece, direction, direction))
+                if adjacent_square in self.grid:
+                    if self.grid[adjacent_square] == BLANK:
+                        moves.append((piece,adjacent_square))
         
                 # if not, jump another square ahead
-                opposite_square = self.sumTuples(zip(piece, direction, direction))
-                if(adjacent_square in self.grid and self.grid[adjacent_square] == BLANK):
-                    moves.append((piece,opposite_square))
+                elif opposite_square in self.grid:
+                    if self.grid[opposite_square] == BLANK:
+                        moves.append((piece,opposite_square))
         return moves
     
     # sums up set of zipped tuples
@@ -282,22 +285,22 @@ class Board:
                     break
     
     # returns score for minimax evaluation of grid state
-    def eval(self, colour):
+    def eval(self, colour, timer):
         enemy = BLACK if colour == WHITE else WHITE
         playerPieces = self.getPieces(colour)
         enemyPieces = self.getPieces(enemy)
-        score = 0;
+        score = 0
         
         # Score = Player Defense - Enemy Defense
         # Defense = 5 - Vulnerability (5 = Max Vulnerability) (negative correlation)
         for piece in playerPieces:
-            score += 5 - self.calcVulnerability(piece, colour, enemy)
+            score += 5 - self.calcVulnerability(piece, colour, enemy, timer)
         for piece in enemyPieces:
-            score -= 5 - self.calcVulnerability(piece, enemy, colour)
+            score -= 5 - self.calcVulnerability(piece, enemy, colour, timer)
             
         return score
     
-    def calcVulnerability(self, piece, colour, enemy):
+    def calcVulnerability(self, piece, colour, enemy, timer):
         vulnerableCount = 0;
         vulnerableSum = 0;
         origin = (int)((8-self.size)/2) # in case grid has shrunk
@@ -320,6 +323,14 @@ class Board:
                     vulnerableSum += (int(posAxis == CORNER or posAxis == enemy) + int(negAxis == CORNER or negAxis == enemy))*0.5
                 
         vulnerableAvg = vulnerableSum/vulnerableCount if vulnerableCount != 0 else 0
+        
+        # Border danger ranges from 0 to 4, applies only to edge pieces, maximum possible danger = maximum possible vulnerability
+        borderDanger = 0
+        if 24 <= timer < 128+24 and (0 in piece or 7 in piece):
+            borderDanger = (timer-24)/32
+        elif 128+24 <= timer < 192+24 and (1 in piece or 6 in piece):
+            borderDanger = (timer-24)/16
+        
         # Level of vulnerability has 3 times higher priority than number of vulnerable axes
-        vulnerableWeighted = vulnerableSum + 3*vulnerableAvg
+        vulnerableWeighted = vulnerableSum + 3*vulnerableAvg + borderDanger
         return vulnerableWeighted
