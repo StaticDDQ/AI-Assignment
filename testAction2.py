@@ -29,12 +29,12 @@ class Player:
         if self.timer < 24:
             move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, True)[1]
             self.board.addPiece(move, self.colour)
-            self.board.updateKills(self.enemy)
         # during moving phase
         else:
             move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, False)[1]
             self.board.movePiece(move[0], move[1])
         self.timer += 1
+        self.board.updateKills(self.enemy)
         self.board.updateKills(self.colour)
         return move
     
