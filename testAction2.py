@@ -27,6 +27,7 @@ class Player:
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
         # during placing phase
+        print(self.board.getPieces(BLACK))
         if self.timer < 24:
             move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, True)[1]
             self.board.addPiece(move, self.colour)
