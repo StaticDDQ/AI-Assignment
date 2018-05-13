@@ -73,6 +73,8 @@ class Player:
         tempState.updateKills(colour)
         if(tempState.size != size):
             tempState.updateGridSize(size)
+            enemy = WHITE if colour == BLACK else WHITE
+            tempState.updateKills(enemy)
             tempState.updateKills(colour)
         return tempState
         
@@ -81,6 +83,8 @@ class Player:
         # copy current state and add a piece
         tempState = deepcopy(state)
         tempState.addPiece(pos, colour)
+        enemy = WHITE if colour == BLACK else WHITE
+        tempState.updateKills(enemy)
         tempState.updateKills(colour)
         return tempState
     
