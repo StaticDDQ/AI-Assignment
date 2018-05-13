@@ -13,48 +13,46 @@ class Player:
         # Y range is (0-5) for white, else (2-7)
         self.minY = 0 if colour == 'white' else 2
         self.colour = WHITE if colour == 'white' else BLACK
+        self.enemy = BLACK if colour == 'white' else WHITE
         # initate empty game state
         self.board = Board(8)
         # get all positions for placing phase
         self.availablePosition = self.getAllPositions(self.board.grid, self.minY)
     
     def action(self, turns):
-        # shrink to size of 6 when it reaches move 128
+        # during placing phase
         if(self.timer == 128+24):
             self.board.updateGridSize(6)
-            print("Shrinking for " + self.colour + " in action()")
-        # shrink to size of 4 when it reaches move 192
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
-        # during placing phase
+            
         if self.timer < 24:
             move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, True)[1]
             self.board.addPiece(move, self.colour)
+            self.board.updateKills(self.enemy)
         # during moving phase
         else:
             move = self.abPruning(self.colour, self.board, self.board.size, 2, self.timer, False)[1]
             self.board.movePiece(move[0], move[1])
         self.timer += 1
-        self.board.updateKills()
+        self.board.updateKills(self.colour)
         return move
     
     def update(self, action):
         # during placing phase
         if self.timer < 24:
-            enemy = BLACK if self.colour == WHITE else WHITE
-            self.board.addPiece(action, enemy)
+            self.board.addPiece(action, self.enemy)
         # during moving phase
         else:
             self.board.movePiece(action[0], action[1])
 		# update board size if it shrinks
         if(self.timer == 128+24):
             self.board.updateGridSize(6)
-            print("Shrinking for " + self.colour + " in update()")
         elif(self.timer == 192+24):
             self.board.updateGridSize(4)
         self.timer += 1
-        self.board.updateKills()
-        #print(self.board.getPieces(BLACK))
+        self.board.updateKills(self.colour)
+        self.board.updateKills(self.enemy)
     
     # get all possible positions within appropriate range, for placing phase
     def getAllPositions(self, grid, minY):
@@ -66,24 +64,24 @@ class Player:
         return availablePosition
     
     # make a copy of the next state when it makes a move
-    def createNextState(self, state, size, move):
+    def createNextState(self, state, size, move, colour):
         # copy current state
         tempState = deepcopy(state)
         # check if the grid shrinks
         # move piece to appropriate location
         tempState.movePiece(move[0], move[1])
-        tempState.updateKills()
+        tempState.updateKills(colour)
         if(tempState.size != size):
             tempState.updateGridSize(size)
-            tempState.updateKills()
+            tempState.updateKills(colour)
         return tempState
         
     # make a next state during placing phase
-    def createNextPlacementState(self, state, pos, tile):
+    def createNextPlacementState(self, state, pos, colour):
         # copy current state and add a piece
         tempState = deepcopy(state)
-        tempState.addPiece(pos, tile)
-        tempState.updateKills()
+        tempState.addPiece(pos, colour)
+        tempState.updateKills(colour)
         return tempState
     
     # minimax algorithm for the moving phase
@@ -119,7 +117,7 @@ class Player:
                         if(isPlacing):
                             nextState = self.createNextPlacementState(state, move, colour)
                         else:
-                            nextState = self.createNextState(state, size, move)
+                            nextState = self.createNextState(state, size, move,colour)
                         # switch players
                         colour = WHITE if colour == BLACK else BLACK
                         
@@ -141,7 +139,7 @@ class Player:
                         if(isPlacing):
                             nextState = self.createNextPlacementState(state, move, colour)
                         else:
-                            nextState = self.createNextState(state,size,move)
+                            nextState = self.createNextState(state,size,move,colour)
                         
                         colour = WHITE if colour == BLACK else BLACK
                         
@@ -256,8 +254,8 @@ class Board:
         return tuple([sum(x) for x in zipped])
     
     # add kills from shrinking
-    def updateKills(self):
-        totalPieces = self.getPieces()
+    def updateKills(self, colour):
+        totalPieces = self.getPieces(colour)
         for piece in totalPieces:
             enemy = BLACK if self.grid[piece] == WHITE else WHITE
             origin = (int)((8-self.size)/2)
