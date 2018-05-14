@@ -44,6 +44,10 @@ class Player:
         return move
     
     def update(self, action):
+        if(self.timer == 128+24):
+            self.board.updateGridSize(6)
+        elif(self.timer == 192+24):
+            self.board.updateGridSize(4)
         # during placing phase
         if self.timer < 24:
             self.board.addPiece(action, self.enemy)
@@ -51,10 +55,7 @@ class Player:
         else:
             self.board.movePiece(action[0], action[1])
 		# update board size if it shrinks
-        if(self.timer == 128+24):
-            self.board.updateGridSize(6)
-        elif(self.timer == 192+24):
-            self.board.updateGridSize(4)
+        
         self.timer += 1
         self.board.updateKills(self.colour)
         self.board.updateKills(self.enemy)
@@ -218,7 +219,8 @@ class Board:
                 deletion.append(tile)
         for tile in deletion:
             self.grid.pop(tile)
-
+        self.updateKills(WHITE)
+        self.updateKills(BLACK)
     
     # adds a piece, during placing phase
     def addPiece(self, pos, piece):
@@ -265,7 +267,7 @@ class Board:
         
                 # if not, jump another square ahead
                 elif opposite_square in self.grid:
-                    if self.grid[opposite_square] == BLANK:
+                    if self.grid[opposite_square] == BLANK and self.grid[adjacent_square] in [WHITE, BLACK]:
                         moves.append((piece,opposite_square))
         return moves
     
@@ -308,9 +310,9 @@ class Board:
         # Score = Player Defense - Enemy Defense
         # Defense = 5 - Vulnerability (5 = Max Vulnerability) (negative correlation)
         for piece in playerPieces:
-            score += 5 - self.calcVulnerability(piece, colour, enemy, timer)
+            score += 8 - self.calcVulnerability(piece, colour, enemy, timer)
         for piece in enemyPieces:
-            score -= 5 - self.calcVulnerability(piece, enemy, colour, timer)
+            score -= 8 - self.calcVulnerability(piece, enemy, colour, timer)
             
         return score
     
