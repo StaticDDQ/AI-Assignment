@@ -31,12 +31,16 @@ class Player:
         # during moving phase
         else:
             move = self.minimax(self.colour, self.board, self.board.size, 2, self.timer, False)[1]
+            print("Available moves: ")
             print(self.board.availableMoves(self.colour))
+            print("Move chosen: ")
             print(move)
             self.board.movePiece(move[0], move[1])
         self.timer += 1
         self.board.updateKills(self.enemy)
         self.board.updateKills(self.colour)
+        print("Current grid from " + self.colour + "'s perspective")
+        self.board.printGrid()
         return move
     
     def update(self, action):
@@ -54,6 +58,8 @@ class Player:
         self.timer += 1
         self.board.updateKills(self.colour)
         self.board.updateKills(self.enemy)
+        print("Current grid from " + self.colour + "'s perspective")
+        self.board.printGrid()
     
     # get all possible positions within appropriate range, for placing phase
     def getAllPositions(self, grid, minY):
@@ -176,12 +182,12 @@ class Board:
     def __init__(self, size):
         self.size = size
         self.grid = self.gridInit(size)
-        
+    
     def gridInit(self, size):
         grid = {}
         calc = (int)((8-size)/2) # in case grid has shrunk
-        for row in range(calc,size+calc):
-            for col in range(calc,size+calc):
+        for col in range(calc,size+calc):
+            for row in range(calc,size+calc):
                 if((row == size+calc-1 and col == size+calc-1) or 
                    (row == size+calc-1 and col == calc) or
                    (row == calc and col == size+calc-1) or 
@@ -192,6 +198,14 @@ class Board:
         
         return grid
     
+    def printGrid(self):
+        origin = (int)((8-self.size)/2)
+        for row in range(origin, origin+self.size):
+            rowStr = ""
+            for col in range(origin, origin+self.size):
+                rowStr += self.grid[col, row] + " "
+            print(rowStr)
+	
     def updateGridSize(self, size):
         self.size = size
         origin = (int)((8-size)/2)
@@ -262,8 +276,8 @@ class Board:
     # add kills from shrinking
     def updateKills(self, colour):
         totalPieces = self.getPieces(colour)
+        enemy = BLACK if colour == WHITE else WHITE
         for piece in totalPieces:
-            enemy = BLACK if self.grid[piece] == WHITE else WHITE
             origin = (int)((8-self.size)/2)
             
             # checks x-axis, then y-axis
